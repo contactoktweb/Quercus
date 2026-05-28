@@ -4,7 +4,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 const qara = localFont({
-  src: '../public/Tipografía/qara.otf',
+  src: '../public/fonts/qara.otf',
   variable: '--font-serif',
   display: 'swap',
 });
@@ -12,47 +12,47 @@ const qara = localFont({
 const clarika = localFont({
   src: [
     {
-      path: '../public/Tipografía/clarikageo-thin.otf',
+      path: '../public/fonts/clarikageo-thin.otf',
       weight: '100',
       style: 'normal',
     },
     {
-      path: '../public/Tipografía/clarikageo-thin.otf',
+      path: '../public/fonts/clarikageo-thin.otf',
       weight: '200',
       style: 'normal',
     },
     {
-      path: '../public/Tipografía/clarikageo-light.otf',
+      path: '../public/fonts/clarikageo-light.otf',
       weight: '300',
       style: 'normal',
     },
     {
-      path: '../public/Tipografía/clarikageo-light.otf',
+      path: '../public/fonts/clarikageo-light.otf',
       weight: '400',
       style: 'normal',
     },
     {
-      path: '../public/Tipografía/clarikageo-light.otf',
+      path: '../public/fonts/clarikageo-light.otf',
       weight: '500',
       style: 'normal',
     },
     {
-      path: '../public/Tipografía/clarikageo-light.otf',
+      path: '../public/fonts/clarikageo-light.otf',
       weight: '600',
       style: 'normal',
     },
     {
-      path: '../public/Tipografía/clarikageo-light.otf',
+      path: '../public/fonts/clarikageo-light.otf',
       weight: '700',
       style: 'normal',
     },
     {
-      path: '../public/Tipografía/clarikageo-light.otf',
+      path: '../public/fonts/clarikageo-light.otf',
       weight: '800',
       style: 'normal',
     },
     {
-      path: '../public/Tipografía/clarikageo-light.otf',
+      path: '../public/fonts/clarikageo-light.otf',
       weight: '900',
       style: 'normal',
     }
