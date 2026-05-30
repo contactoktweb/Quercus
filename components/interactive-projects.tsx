@@ -102,7 +102,7 @@ function ProjectColumn({
         <motion.span 
           className="text-warm-white/40 text-xs tracking-luxury"
           animate={{ opacity: isHovered ? 0 : 1 }}
-          transition={{ duration: 0.3 }}
+          transition={{ duration: isHovered ? 0.3 : 0 }}
         >
           0{index + 1}
         </motion.span>
@@ -111,14 +111,9 @@ function ProjectColumn({
         <div className="flex-1 flex items-center justify-center">
           <motion.div
             className="flex flex-col items-center justify-center"
-            animate={{ 
-              y: isHovered ? -20 : 0,
-              scale: isHovered ? 1.1 : 1
-            }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
           >
             {project.logo ? (
-              <img src={project.logo} alt={project.name} className="h-20 md:h-28 lg:h-32 object-contain filter brightness-0 invert opacity-90" />
+              <img src={project.logo} alt={project.name} className="h-20 md:h-28 lg:h-32 object-contain" />
             ) : (
               <h3 className="font-serif text-warm-white text-2xl md:text-3xl lg:text-4xl text-center">
                 {project.name}
@@ -133,7 +128,7 @@ function ProjectColumn({
           <motion.p
             className="text-warm-white/50 text-xs tracking-luxury uppercase text-center"
             animate={{ opacity: isHovered ? 0 : 1 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: isHovered ? 0.3 : 0 }}
           >
             {project.location}
           </motion.p>
@@ -143,7 +138,7 @@ function ProjectColumn({
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
+                exit={{ opacity: 0, y: 0, transition: { duration: 0 } }}
                 transition={{ duration: 0.4, delay: 0.1 }}
                 className="space-y-4"
               >
@@ -233,7 +228,7 @@ function MobileProjectCard({ project, index }: { project: typeof projectsData[0]
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <span className="text-warm-white/50 text-xs tracking-luxury mb-2">0{index + 1}</span>
           {project.logo ? (
-            <img src={project.logo} alt={project.name} className="h-12 object-contain filter brightness-0 invert mb-4 self-start" />
+            <img src={project.logo} alt={project.name} className="h-12 object-contain mb-4 self-start" />
           ) : (
             <h3 className="font-serif text-warm-white text-2xl mb-2">{project.name}</h3>
           )}

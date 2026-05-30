@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { InteractiveMasterPlan } from '@/components/interactive-master-plan'
+import { Investment } from '@/components/investment'
 import { MasonryGallery } from '@/components/masonry-gallery'
 import { ProjectContactForm } from '@/components/project-contact-form'
 import { Project } from '@/lib/projects-data'
@@ -54,7 +55,7 @@ function HeroSection({ project }: { project: Project }) {
           <h1 className="font-serif text-5xl md:text-6xl lg:text-8xl text-warm-white mb-4">
             {project.logo ? (
               <>
-                <img src={project.logo} alt={project.name} className="h-16 md:h-24 lg:h-32 object-contain filter brightness-0 invert" />
+                <img src={project.logo} alt={project.name} className="h-16 md:h-24 lg:h-32 object-contain" />
                 <span className="sr-only">{project.name}</span>
               </>
             ) : (
@@ -263,6 +264,8 @@ export function ProjectPageTemplate({ project }: ProjectPageTemplateProps) {
       <HeroSection project={project} />
       <StatsSection project={project} />
       
+      <Investment />
+
       {/* Master Plan Section */}
       <section id="masterplan" className="py-20 md:py-28 bg-soft-black">
         <div className="max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20">

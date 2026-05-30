@@ -12,10 +12,14 @@ export function HistoryTeaser() {
   return (
     <section ref={ref} className="py-32 md:py-40 bg-gunmetal relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full border border-warm-white" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full border border-warm-white" />
-      </div>
+      <div 
+        className="absolute inset-0 opacity-15" 
+        style={{ 
+          backgroundImage: "url('/logos/hoja.png')",
+          backgroundRepeat: 'repeat',
+          backgroundSize: '200px'
+        }} 
+      />
 
       <div className="max-w-[900px] mx-auto px-6 md:px-12 lg:px-20 text-center relative z-10">
         <motion.span

@@ -10,7 +10,6 @@ const navItems = [
   { name: 'Comunidades', href: '#', hasMegaMenu: true },
   { name: 'Historia', href: '/historia' },
   { name: 'Sostenibilidad', href: '/#sostenibilidad' },
-  { name: 'Contacto', href: '/#contacto' },
 ]
 
 const bcsProjects = getProjectsByRegion('baja-california-sur')
