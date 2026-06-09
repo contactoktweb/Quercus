@@ -8,7 +8,6 @@ import { FeaturedProject } from '@/components/featured-project'
 import { HistoryTeaser } from '@/components/history-teaser'
 import { Testimonials } from '@/components/testimonials'
 import { Location } from '@/components/location'
-
 import { ContactForm } from '@/components/contact-form'
 import { Footer } from '@/components/footer'
 
@@ -25,7 +24,6 @@ export default function Home() {
       <HistoryTeaser />
       <Testimonials />
       <Location />
-
       <ContactForm />
       <Footer />
     </main>
