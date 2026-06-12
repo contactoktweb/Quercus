@@ -7,25 +7,49 @@ const statusColors = {
 };
 
 // Capa base de relleno para los polígonos
-export const lotFillLayer: FillLayer = {
-  id: 'lot-fill',
+export const baseFillLayer: FillLayer = {
+  id: 'lot-base-fill',
   type: 'fill',
   paint: {
     'fill-color': [
       'case',
       ['==', ['get', 'status'], 'available'], statusColors.available,
-      statusColors.occupied // Cualquier otro estado (vendido, reservado, en proceso) se pinta rojo
+      statusColors.occupied
     ],
-    'fill-opacity': 0.6
+    'fill-opacity': 0.4
   }
 };
 
 // Capa base de borde para los polígonos
-export const lotLineLayer: LineLayer = {
-  id: 'lot-line',
+export const borderLayer: LineLayer = {
+  id: 'lot-border',
   type: 'line',
   paint: {
-    'line-color': 'rgba(255, 255, 255, 0.6)', // Bordes claros para delimitar bien las zonas
-    'line-width': 2
+    'line-color': 'rgba(255, 255, 255, 0.6)',
+    'line-width': 1
+  }
+};
+
+// Capa de highlight dinámico basada en filtros
+export const hoverHighlightLayer: FillLayer = {
+  id: 'lot-hover-highlight',
+  type: 'fill',
+  paint: {
+    'fill-color': [
+      'case',
+      ['==', ['get', 'status'], 'available'], statusColors.available,
+      statusColors.occupied
+    ],
+    'fill-opacity': 0.9 // Más opaco al hacer hover para resaltar
+  }
+};
+
+// Capa para el borde del elemento seleccionado
+export const selectedBorderLayer: LineLayer = {
+  id: 'lot-selected-border',
+  type: 'line',
+  paint: {
+    'line-color': '#c2a67e', // Color dorado/khaki
+    'line-width': 3
   }
 };

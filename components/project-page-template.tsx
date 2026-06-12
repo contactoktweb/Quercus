@@ -184,31 +184,26 @@ function LocationSection({ project }: { project: Project }) {
     <section ref={ref} className="py-20 md:py-28 bg-warm-white">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Map placeholder */}
+          {/* Real Google Maps */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="relative aspect-square bg-rifle-green/10 overflow-hidden"
+            className="relative aspect-square overflow-hidden bg-rifle-green/10"
           >
-            {/* Stylized map representation */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="relative w-3/4 h-3/4">
-                {/* Map outline */}
-                <svg viewBox="0 0 200 200" className="w-full h-full text-rifle-green/30" fill="none" stroke="currentColor" strokeWidth="0.5">
-                  <path d="M20,100 Q40,60 80,80 T120,100 T160,80 T180,100" />
-                  <path d="M40,120 Q60,100 100,120 T140,120 T180,140" />
-                  <circle cx="100" cy="100" r="60" strokeDasharray="4 4" />
-                </svg>
-                {/* Location marker */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                  <div className="w-4 h-4 bg-khaki rounded-full animate-pulse" />
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 border border-khaki/50 rounded-full" />
-                </div>
-              </div>
-            </div>
+            <iframe 
+              width="100%" 
+              height="100%" 
+              frameBorder="0" 
+              scrolling="no" 
+              marginHeight={0} 
+              marginWidth={0} 
+              src={`https://maps.google.com/maps?q=${project.coordinates.lat},${project.coordinates.lng}&hl=es&z=13&output=embed`}
+              className="absolute inset-0 border-0"
+              title={`Ubicación de ${project.location}`}
+            />
             {/* Coordinates */}
-            <div className="absolute bottom-4 left-4 text-xs tracking-luxury text-rifle-green/50">
+            <div className="absolute bottom-4 left-4 text-xs tracking-luxury text-gunmetal bg-warm-white/90 px-3 py-1.5 backdrop-blur-sm pointer-events-none shadow-sm z-10">
               {project.coordinates.lat.toFixed(4)}°N, {Math.abs(project.coordinates.lng).toFixed(4)}°W
             </div>
           </motion.div>

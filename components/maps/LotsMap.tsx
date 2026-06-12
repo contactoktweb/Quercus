@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback } from 'react';
 import Map, { Source, Layer, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { lotFillLayer, lotLineLayer } from './mapLayers';
+import { baseFillLayer, borderLayer, hoverHighlightLayer, selectedBorderLayer } from './mapLayers';
 import { lotsData } from '@/data/lots';
 import { LotProperties } from './mapTypes';
 import { LotTooltip } from './LotTooltip';
@@ -12,6 +12,31 @@ export interface LotsMapProps {
   onSelectLot?: (lot: LotProperties | null) => void;
   className?: string;
   hideSidebar?: boolean;
+}
+
+// Función para determinar el criterio de highlight basado en las propiedades del feature
+function getHighlightFilter(feature: GeoJSON.Feature) {
+  const properties = feature.properties as LotProperties | null;
+  if (!properties) return null;
+
+  if (properties.parentLotId) {
+    return {
+      key: 'parentLotId',
+      value: properties.parentLotId
+    };
+  }
+
+  if (properties.blockId) {
+    return {
+      key: 'blockId',
+      value: properties.blockId
+    };
+  }
+
+  return {
+    key: 'id',
+    value: properties.id
+  };
 }
 
 export default function LotsMap({ onSelectLot, className, hideSidebar = false }: LotsMapProps = {}) {
@@ -49,59 +74,49 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false }:
     }
   }, [onSelectLot]);
 
-  // Extraemos el ID para los filtros de las capas dinámicas
-  const selectedLotId = selectedLot?.id || '';
-  const hoveredLotId = hoverInfo?.feature?.properties?.id || hoverInfo?.feature?.id || '';
+  // Filtros dinámicos para Hover (Highlight By Filter)
+  const hoverFilter = useMemo(() => {
+    if (!hoverInfo) return ['in', 'id', '']; // No mostrar nada si no hay hover
 
-  // Filtros para las capas interactivas (hover y selección) usando el id de las properties
-  const filterHover = useMemo(() => ['in', 'id', hoveredLotId], [hoveredLotId]);
+    const filterCriteria = getHighlightFilter(hoverInfo.feature);
+    if (!filterCriteria) return ['in', 'id', ''];
+
+    return ['in', filterCriteria.key, filterCriteria.value];
+  }, [hoverInfo]);
+
+  // Filtro para el elemento seleccionado (usamos el id único)
+  const selectedLotId = selectedLot?.id || '';
   const filterSelect = useMemo(() => ['in', 'id', selectedLotId], [selectedLotId]);
 
   return (
     <div className={className || "w-full h-[600px] md:h-[700px] rounded-2xl overflow-hidden shadow-2xl border border-gray-200 relative bg-gray-50"}>
       <Map
         initialViewState={{
-          longitude: -110.3127,
-          latitude: 24.1425,
+          longitude: -109.9728, // Zona rural (El Sargento / La Ventana)
+          latitude: 24.0926,
           zoom: 18,
-          pitch: 45, // Ángulo más inmersivo
-          bearing: -15 // Ligera rotación
+          pitch: 0,
+          bearing: 0
         }}
-        mapStyle="https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json" // Estilo oscuro que encaja perfecto con MASTER PLAN
-        interactiveLayerIds={['lot-fill']} // Definimos qué capa reacciona a los eventos del mouse
+        mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json" // Estilo claro (blanco)
+        interactiveLayerIds={['lot-base-fill', 'lot-hover-highlight', 'lot-selected-border']} // Definimos qué capas reaccionan a los eventos del mouse
         onMouseMove={onHover}
         onClick={onClick}
         onMouseLeave={() => setHoverInfo(null)}
         cursor={hoverInfo ? 'pointer' : 'grab'}
       >
         <Source type="geojson" data={lotsData}>
-          {/* 1. Capa base de relleno coloreada por estado */}
-          <Layer {...lotFillLayer} />
+          {/* 1. Capa base de relleno con baja opacidad */}
+          <Layer {...baseFillLayer} />
           
           {/* 2. Capa base de bordes */}
-          <Layer {...lotLineLayer} />
+          <Layer {...borderLayer} />
           
-          {/* 3. Capa extra para Hover (Aumenta el brillo del polígono) */}
-          <Layer 
-            id="lot-hover-fill"
-            type="fill"
-            paint={{
-              'fill-color': '#ffffff',
-              'fill-opacity': 0.3
-            }}
-            filter={filterHover}
-          />
+          {/* 3. Capa de highlight dinámico basada en filtros */}
+          <Layer {...hoverHighlightLayer} filter={hoverFilter} />
           
           {/* 4. Capa extra para Selección (Borde más grueso y color Khaki/Dorado) */}
-          <Layer 
-            id="lot-selected-line"
-            type="line"
-            paint={{
-              'line-color': '#c2a67e', // Color Khaki del proyecto
-              'line-width': 4
-            }}
-            filter={filterSelect}
-          />
+          <Layer {...selectedBorderLayer} filter={filterSelect} />
         </Source>
 
         {/* Renderizado del Popup de Hover */}

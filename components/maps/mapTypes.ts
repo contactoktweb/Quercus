@@ -8,7 +8,10 @@ export interface LotProperties {
   area: string;
   price?: string;
   description?: string;
-  parentLotId: string | null;
+  parentLotId?: string | null;
+  groupId?: string | null;
+  blockId?: string | null;
+  phaseId?: string | null;
   zoneType: ZoneType;
 }
 
