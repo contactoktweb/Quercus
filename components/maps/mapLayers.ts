@@ -30,6 +30,16 @@ export const borderLayer: LineLayer = {
   }
 };
 
+// Capa INVISIBLE de hit-test — cubre el 100% de cada lote sin huecos para hover y clic
+export const hitTestLayer: FillLayer = {
+  id: 'lot-hit',
+  type: 'fill',
+  paint: {
+    'fill-color': 'transparent',
+    'fill-opacity': 0
+  }
+};
+
 // Capa de highlight dinámico basada en filtros
 export const hoverHighlightLayer: FillLayer = {
   id: 'lot-hover-highlight',

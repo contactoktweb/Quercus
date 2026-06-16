@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import Map, { Source, Layer, MapLayerMouseEvent } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { baseFillLayer, borderLayer, hoverHighlightLayer, selectedBorderLayer } from './mapLayers';
+import { baseFillLayer, borderLayer, hoverHighlightLayer, selectedBorderLayer, hitTestLayer } from './mapLayers';
 import { lotsData } from '@/data/lots';
 import { LotProperties } from './mapTypes';
 import { LotTooltip } from './LotTooltip';
@@ -40,24 +40,54 @@ function getHighlightFilter(feature: GeoJSON.Feature) {
 }
 
 export default function LotsMap({ onSelectLot, className, hideSidebar = false }: LotsMapProps = {}) {
-  const [hoverInfo, setHoverInfo] = useState<{
-    feature: GeoJSON.Feature;
-    lngLat: [number, number];
-  } | null>(null);
-  
+  const [hoveredFeature, setHoveredFeature] = useState<GeoJSON.Feature | null>(null);
+  const [hoverLngLat, setHoverLngLat] = useState<[number, number] | null>(null);
+  const hoveredIdRef   = useRef<string | null>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const showTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const [selectedLot, setSelectedLot] = useState<LotProperties | null>(null);
+
+  const clearShow = () => {
+    if (showTimeoutRef.current) { clearTimeout(showTimeoutRef.current); showTimeoutRef.current = null; }
+  };
+  const clearHide = () => {
+    if (hideTimeoutRef.current) { clearTimeout(hideTimeoutRef.current); hideTimeoutRef.current = null; }
+  };
 
   const onHover = useCallback((event: MapLayerMouseEvent) => {
     const { features, lngLat } = event;
-    const hoveredFeature = features && features[0];
+    const feature = features && features[0];
 
-    if (hoveredFeature && hoveredFeature.properties) {
-      setHoverInfo({
-        feature: hoveredFeature,
-        lngLat: [lngLat.lng, lngLat.lat]
-      });
+    if (feature && feature.properties) {
+      // Cancelar cualquier "ocultar" pendiente — seguimos sobre un lote
+      clearHide();
+
+      const newId = feature.properties.id;
+
+      if (hoveredIdRef.current !== newId) {
+        // Cambiamos de lote: cancelar el show anterior y arrancar uno nuevo
+        clearShow();
+        hoveredIdRef.current = newId;
+
+        // Pequeño delay antes de mostrar el tooltip (evita flash al pasar rápido)
+        showTimeoutRef.current = setTimeout(() => {
+          setHoveredFeature(feature);
+          setHoverLngLat([lngLat.lng, lngLat.lat]);
+          showTimeoutRef.current = null;
+        }, 300);
+      }
     } else {
-      setHoverInfo(null);
+      // Micro-gap en borde: esperar 80ms antes de ocultar
+      clearShow(); // cancelar show pendiente si aún no apareció
+      if (hoveredIdRef.current !== null && !hideTimeoutRef.current) {
+        hideTimeoutRef.current = setTimeout(() => {
+          hoveredIdRef.current = null;
+          setHoveredFeature(null);
+          setHoverLngLat(null);
+          hideTimeoutRef.current = null;
+        }, 80);
+      }
     }
   }, []);
 
@@ -76,13 +106,14 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false }:
 
   // Filtros dinámicos para Hover (Highlight By Filter)
   const hoverFilter = useMemo(() => {
-    if (!hoverInfo) return ['in', 'id', '']; // No mostrar nada si no hay hover
+    if (!hoveredFeature) return ['in', 'id', '']; // No mostrar nada si no hay hover
 
-    const filterCriteria = getHighlightFilter(hoverInfo.feature);
-    if (!filterCriteria) return ['in', 'id', ''];
+    // Solo resaltamos el lote individual sobre el que estamos parados
+    const properties = hoveredFeature.properties as LotProperties | null;
+    if (!properties) return ['in', 'id', ''];
 
-    return ['in', filterCriteria.key, filterCriteria.value];
-  }, [hoverInfo]);
+    return ['in', 'id', properties.id];
+  }, [hoveredFeature]);
 
   // Filtro para el elemento seleccionado (usamos el id único)
   const selectedLotId = selectedLot?.id || '';
@@ -90,41 +121,81 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false }:
 
   return (
     <div className={className || "w-full h-[600px] md:h-[700px] rounded-2xl overflow-hidden shadow-2xl border border-gray-200 relative bg-gray-50"}>
+      {/* Inyectamos CSS global para forzar que el popup NUNCA robe el clic del mouse */}
+      <style dangerouslySetInnerHTML={{__html: `
+        .maplibregl-popup, .mapboxgl-popup {
+          pointer-events: none !important;
+        }
+      `}} />
+      
       <Map
         initialViewState={{
-          longitude: -109.9728, // Zona rural (El Sargento / La Ventana)
-          latitude: 24.0926,
-          zoom: 18,
-          pitch: 0,
-          bearing: 0
+          longitude: -110.7059, // Coordenada central del nuevo polígono
+          latitude: 23.8060,
+          zoom: 14,
+          pitch: 0, // Vista 2D
+          bearing: 0 // Vista norte arriba
         }}
-        mapStyle="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json" // Estilo claro (blanco)
-        interactiveLayerIds={['lot-base-fill', 'lot-hover-highlight', 'lot-selected-border']} // Definimos qué capas reaccionan a los eventos del mouse
+        mapStyle={{
+          version: 8,
+          sources: {
+            'raster-tiles': {
+              type: 'raster',
+              tiles: [
+                'https://a.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                'https://b.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                'https://c.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png',
+                'https://d.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png'
+              ],
+              tileSize: 256,
+              attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+            }
+          },
+          layers: [
+            {
+              id: 'simple-tiles',
+              type: 'raster',
+              source: 'raster-tiles',
+              minzoom: 0,
+              maxzoom: 20
+            }
+          ]
+        }}
+        interactiveLayerIds={['lot-hit']}
         onMouseMove={onHover}
         onClick={onClick}
-        onMouseLeave={() => setHoverInfo(null)}
-        cursor={hoverInfo ? 'pointer' : 'grab'}
+        onMouseLeave={() => {
+          clearShow();
+          clearHide();
+          hoveredIdRef.current = null;
+          setHoveredFeature(null);
+          setHoverLngLat(null);
+        }}
+        cursor={hoveredFeature ? 'pointer' : 'grab'}
       >
         <Source type="geojson" data={lotsData}>
           {/* 1. Capa base de relleno con baja opacidad */}
           <Layer {...baseFillLayer} />
-          
+
           {/* 2. Capa base de bordes */}
           <Layer {...borderLayer} />
-          
-          {/* 3. Capa de highlight dinámico basada en filtros */}
+
+          {/* 3. Highlight al hacer hover */}
           <Layer {...hoverHighlightLayer} filter={hoverFilter} />
-          
-          {/* 4. Capa extra para Selección (Borde más grueso y color Khaki/Dorado) */}
+
+          {/* 4. Borde dorado para el lote seleccionado */}
           <Layer {...selectedBorderLayer} filter={filterSelect} />
+
+          {/* 5. Capa INVISIBLE encima de todo — única fuente de eventos de mouse */}
+          <Layer {...hitTestLayer} />
         </Source>
 
         {/* Renderizado del Popup de Hover */}
-        {hoverInfo && hoverInfo.feature.properties && (
+        {hoveredFeature && hoveredFeature.properties && hoverLngLat && (
           <LotTooltip 
-            properties={hoverInfo.feature.properties as LotProperties}
-            longitude={hoverInfo.lngLat[0]}
-            latitude={hoverInfo.lngLat[1]}
+            properties={hoveredFeature.properties as LotProperties}
+            longitude={hoverLngLat[0]}
+            latitude={hoverLngLat[1]}
           />
         )}
       </Map>

@@ -24,7 +24,8 @@ export function LotTooltip({ properties, longitude, latitude, onClose, closeButt
       onClose={onClose}
       anchor="bottom"
       offset={15}
-      className="z-50"
+      className="z-50 pointer-events-none"
+      style={{ pointerEvents: 'none' }}
       maxWidth="250px"
     >
       <div className="p-1 font-sans">
