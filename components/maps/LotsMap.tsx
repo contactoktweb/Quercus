@@ -12,6 +12,7 @@ export interface LotsMapProps {
   onSelectLot?: (lot: LotProperties | null) => void;
   className?: string;
   hideSidebar?: boolean;
+  projectSlug?: string;
 }
 
 // Función para determinar el criterio de highlight basado en las propiedades del feature
@@ -39,7 +40,7 @@ function getHighlightFilter(feature: GeoJSON.Feature) {
   };
 }
 
-export default function LotsMap({ onSelectLot, className, hideSidebar = false }: LotsMapProps = {}) {
+export default function LotsMap({ onSelectLot, className, hideSidebar = false, projectSlug }: LotsMapProps = {}) {
   const [hoveredFeature, setHoveredFeature] = useState<GeoJSON.Feature | null>(null);
   const [hoverLngLat, setHoverLngLat] = useState<[number, number] | null>(null);
   const hoveredIdRef   = useRef<string | null>(null);
@@ -173,6 +174,27 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false }:
         }}
         cursor={hoveredFeature ? 'pointer' : 'grab'}
       >
+        {projectSlug === 'dunah' && (
+          <Source 
+            id="dunah-overlay" 
+            type="image" 
+            url="/dunah-map.png"
+            coordinates={[
+              [-110.70848722842591, 23.805388986812932], // top-left
+              [-110.70015563621189, 23.797131696161504], // top-right
+              [-110.70582821433128, 23.792340075688564], // bottom-right
+              [-110.71415980654531, 23.800597366339993]  // bottom-left
+            ]}
+          >
+            <Layer 
+              id="dunah-overlay-layer" 
+              type="raster" 
+              beforeId="lot-hit"
+              paint={{ 'raster-opacity': 0.85 }} 
+            />
+          </Source>
+        )}
+
         <Source type="geojson" data={lotsData}>
           {/* 1. Capa base de relleno con baja opacidad */}
           <Layer {...baseFillLayer} />
@@ -221,9 +243,10 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false }:
             <div className="flex justify-between items-center border-b border-gray-100 pb-2">
               <span className="font-semibold text-gray-500">Estado</span> 
               <span className={`px-2.5 py-1 rounded-md text-xs font-bold uppercase ${
-                selectedLot.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                selectedLot.status === 'available' ? 'bg-green-100 text-green-800' :
+                selectedLot.status === 'reserved' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'
               }`}>
-                {selectedLot.status === 'available' ? 'Disponible' : 'Ocupado'}
+                {selectedLot.status === 'available' ? 'Disponible' : selectedLot.status === 'reserved' ? 'Apartado' : 'Vendido'}
               </span>
             </div>
             <div className="flex justify-between items-center border-b border-gray-100 pb-2">

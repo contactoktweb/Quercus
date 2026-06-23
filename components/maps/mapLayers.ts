@@ -4,6 +4,7 @@ import type { FillLayer, LineLayer } from 'react-map-gl/maplibre';
 const statusColors = {
   available: '#4ade80', // verde suave
   occupied: '#f87171',  // rojo suave
+  reserved: '#facc15',  // amarillo suave
 };
 
 // Capa base de relleno para los polígonos
@@ -14,6 +15,7 @@ export const baseFillLayer: FillLayer = {
     'fill-color': [
       'case',
       ['==', ['get', 'status'], 'available'], statusColors.available,
+      ['==', ['get', 'status'], 'reserved'], statusColors.reserved,
       statusColors.occupied
     ],
     'fill-opacity': 0.4
@@ -48,6 +50,7 @@ export const hoverHighlightLayer: FillLayer = {
     'fill-color': [
       'case',
       ['==', ['get', 'status'], 'available'], statusColors.available,
+      ['==', ['get', 'status'], 'reserved'], statusColors.reserved,
       statusColors.occupied
     ],
     'fill-opacity': 0.9 // Más opaco al hacer hover para resaltar

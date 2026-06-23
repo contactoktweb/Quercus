@@ -1,4 +1,4 @@
-export type LotStatus = 'available' | 'occupied';
+export type LotStatus = 'available' | 'occupied' | 'reserved';
 export type ZoneType = 'main-lot' | 'sub-zone';
 
 export interface LotProperties {

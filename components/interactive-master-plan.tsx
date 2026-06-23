@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useRef } from 'react'
 import { getLotsByProject, Lot } from '@/lib/projects-data'
 import LotsMap from './maps/LotsMap'
+import InteractiveImageMap from './maps/InteractiveImageMap'
 import { LotProperties } from './maps/mapTypes'
 
 interface InteractiveMasterPlanProps {
@@ -13,7 +14,8 @@ interface InteractiveMasterPlanProps {
 
 const statusColors: Record<string, { bg: string; border: string; label: string }> = {
   available: { bg: 'rgba(74, 222, 128, 0.2)', border: '#4ade80', label: 'Disponible' },
-  occupied: { bg: 'rgba(248, 113, 113, 0.2)', border: '#f87171', label: 'Ocupado' },
+  occupied: { bg: 'rgba(248, 113, 113, 0.2)', border: '#f87171', label: 'Vendido' },
+  reserved: { bg: 'rgba(250, 204, 21, 0.2)', border: '#facc15', label: 'Apartado' },
 }
 
 function LotTooltip({ lot, position }: { lot: Lot; position: { x: number; y: number } }) {
@@ -146,6 +148,7 @@ function LotDetailPanel({
 
 export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveMasterPlanProps) {
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null)
+  const projectLots = getLotsByProject(projectSlug)
 
   const handleLotClick = (lotProps: LotProperties | null) => {
     if (!lotProps) {
@@ -191,11 +194,21 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveM
         <div 
           className="relative aspect-[4/3] bg-rifle-green/5 border border-silver-sand/10 overflow-hidden"
         >
-          <LotsMap 
-            hideSidebar 
-            className="w-full h-full"
-            onSelectLot={handleLotClick}
-          />
+          {projectSlug === 'quintaesencia' ? (
+            <InteractiveImageMap 
+              imageUrl="/quintaesencia.png"
+              lots={projectLots}
+              onSelectLot={handleLotClick}
+              className="w-full h-full"
+            />
+          ) : (
+            <LotsMap 
+              hideSidebar 
+              className="w-full h-full"
+              onSelectLot={handleLotClick}
+              projectSlug={projectSlug}
+            />
+          )}
         </div>
       </div>
 
