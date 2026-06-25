@@ -23,6 +23,12 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
   const [draggingPoint, setDraggingPoint] = useState<{ lotId: string, pointIndex: number } | null>(null);
   const [svgSize, setSvgSize] = useState({ w: 1000, h: 500 });
   const [scale, setScale] = useState(1);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setScale(2.5); // Starts larger on mobile
+    }
+  }, []);
   
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
@@ -279,7 +285,7 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
         <div>
           <h3 className="text-warm-white font-serif text-lg mb-1">Mapa Interactivo</h3>
           <p className="text-silver-sand/60 text-sm">
-            {isEditMode ? 'Dibuja haciendo clic y arrastrando. Selecciona un lote y arrastra sus puntos.' : 'Pasa el cursor por las zonas para ver detalles.'}
+            {isEditMode ? 'Dibuja haciendo clic y arrastrando. Selecciona un lote y arrastra sus puntos.' : 'Pasa el cursor o dale clic a un lote para ver más información.'}
           </p>
         </div>
         <button
@@ -322,8 +328,8 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
           >
             <div 
               ref={imageContainerRef}
-              className={`relative h-auto transition-all duration-300 origin-top-left ${isSpacePressed ? (isPanning ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-crosshair'}`}
-            style={{ width: `${scale * 100}%`, minWidth: '100%' }}
+              className={`relative h-auto transition-all duration-300 origin-top-left md:min-w-full min-w-[700px] ${isSpacePressed ? (isPanning ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-crosshair'}`}
+            style={{ width: `${scale * 100}%` }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
@@ -334,7 +340,6 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
               src={imageUrl} 
               alt="Master Plan" 
               className="w-full h-auto block select-none pointer-events-none"
-              style={{ minHeight: '400px', objectFit: 'contain' }}
               draggable={false}
             />
 

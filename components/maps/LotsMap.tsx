@@ -159,7 +159,7 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
             <div>
               <h3 className="text-warm-white font-serif text-lg mb-1">Mapa Interactivo</h3>
               <p className="text-silver-sand/60 text-sm">
-                {isEditMode ? 'Edición de polígonos.' : 'Pasa el cursor por las zonas para ver detalles.'}
+                {isEditMode ? 'Edición de polígonos.' : 'Pasa el cursor o dale clic a un lote para ver más información.'}
               </p>
             </div>
             <button

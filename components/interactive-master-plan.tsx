@@ -189,10 +189,10 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveM
   return (
     <div className="grid lg:grid-cols-[1fr_350px] gap-8">
       {/* Map Area */}
-      <div className="relative">
+      <div className="relative min-w-0 w-full">
         {/* Master Plan Map */}
         <div 
-          className="relative aspect-[4/3] bg-rifle-green/5 border border-silver-sand/10 overflow-hidden"
+          className="relative h-[650px] lg:h-auto lg:aspect-[4/3] bg-rifle-green/5 border border-silver-sand/10 overflow-hidden"
         >
           {projectSlug === 'quintaesencia' ? (
             <InteractiveImageMap 
