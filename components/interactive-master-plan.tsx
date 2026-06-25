@@ -159,10 +159,10 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveM
     
     // Convert LotProperties to Lot
     const mappedLot: Lot = {
-      id: lotProps.id,
+      id: lotProps.id || 'Nuevo',
       projectSlug: projectSlug,
-      status: lotProps.status as any,
-      area: lotProps.area,
+      status: (lotProps.status || 'available') as any,
+      area: lotProps.area || 'N/A',
       price: lotProps.price || 'Consultar',
       zone: lotProps.zoneType === 'main-lot' ? 'Lote Principal' : 'Sub Zona',
       view: 'Vista panorámica', // fallback

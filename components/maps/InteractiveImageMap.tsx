@@ -279,10 +279,9 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
         <div>
           <h3 className="text-warm-white font-serif text-lg mb-1">Mapa Interactivo</h3>
           <p className="text-silver-sand/60 text-sm">
-            Pasa el cursor por las zonas para ver detalles.
+            {isEditMode ? 'Dibuja haciendo clic y arrastrando. Selecciona un lote y arrastra sus puntos.' : 'Pasa el cursor por las zonas para ver detalles.'}
           </p>
         </div>
-        {/*
         <button
           onClick={() => setIsEditMode(!isEditMode)}
           className={`px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${
@@ -291,7 +290,6 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
         >
           {isEditMode ? 'Salir de Edición' : 'Activar Modo Editor'}
         </button>
-        */}
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4 flex-1 min-h-0">
@@ -492,7 +490,7 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
 
         {/* Edit Panel Sidebar */}
         <AnimatePresence>
-          {isEditMode && selectedEditLot && (
+          {isEditMode && (
             <motion.div
               initial={{ opacity: 0, width: 0, x: 20 }}
               animate={{ opacity: 1, width: '25%', x: 0 }}
@@ -505,7 +503,9 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
               </div>
               
               <div className="p-4 flex flex-col gap-4">
-                <div>
+                {selectedEditLot ? (
+                  <>
+                    <div>
                   <label className="block text-xs font-bold text-gray-500 uppercase mb-1">ID</label>
                   <input 
                     type="text" 
@@ -556,6 +556,16 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
                 >
                   Eliminar Lote
                 </button>
+                  </>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center text-gray-400">
+                    <svg className="w-12 h-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
+                    </svg>
+                    <p className="text-sm font-medium text-gray-500">Ningún lote seleccionado</p>
+                    <p className="text-xs mt-2">Selecciona un lote en el mapa para editar sus propiedades o dibuja uno nuevo.</p>
+                  </div>
+                )}
               </div>
             </motion.div>
           )}

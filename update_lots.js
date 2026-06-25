@@ -1,21 +1,14 @@
-import { LotFeatureCollection } from '@/components/maps/mapTypes';
+const fs = require('fs');
 
-export const lotsData: LotFeatureCollection = {
+const lotsFile = 'data/lots.ts';
+
+const userFeatures = {
   "type": "FeatureCollection",
   "features": [
     {
-      "id": "M-1",
+      "id": "ypgRgZmDbmO8kvEhkLSjioHTiH8h7NvN",
       "type": "Feature",
-      "properties": {
-        "id": "M-1",
-        "name": "Macrolote M-1",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 1 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -45,18 +38,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-2",
+      "id": "r3nQEx8tVw7b3ChG5mzaS50MrQJb1ckI",
       "type": "Feature",
-      "properties": {
-        "id": "M-2",
-        "name": "Macrolote M-2",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 2 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -86,18 +70,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-3",
+      "id": "C2D9yfJ6nGBFNWQgpypYT83QuyxAFsWY",
       "type": "Feature",
-      "properties": {
-        "id": "M-3",
-        "name": "Macrolote M-3",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 3 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -127,18 +102,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-4",
+      "id": "OJ1xqz3mCpx2eS6V1EJA4H1XRkaKJXt9",
       "type": "Feature",
-      "properties": {
-        "id": "M-4",
-        "name": "Macrolote M-4",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 4 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -168,18 +134,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-5",
+      "id": "A8HsqQoQCe8sTtGu0WMlyKW4UOfCV0NG",
       "type": "Feature",
-      "properties": {
-        "id": "M-5",
-        "name": "Macrolote M-5",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 5 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -209,18 +166,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-6",
+      "id": "iWxYgaH9sNWUhz24TKirdsa4R4hY1WQq",
       "type": "Feature",
-      "properties": {
-        "id": "M-6",
-        "name": "Macrolote M-6",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 6 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -250,18 +198,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-7",
+      "id": "BI3dOSNfYmT3Qravov9Q2oU3Ncl6eJve",
       "type": "Feature",
-      "properties": {
-        "id": "M-7",
-        "name": "Macrolote M-7",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 7 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -291,18 +230,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-8",
+      "id": "qUGa429l64rfTPOEPXoNPR37DlmyWKMx",
       "type": "Feature",
-      "properties": {
-        "id": "M-8",
-        "name": "Macrolote M-8",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 8 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -332,18 +262,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-9",
+      "id": "QcjiMpQoiPlvLk4Zr4b2CCXu1TFMdI7c",
       "type": "Feature",
-      "properties": {
-        "id": "M-9",
-        "name": "Macrolote M-9",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 9 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -373,18 +294,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-10",
+      "id": "hvr3626gbU0fxPswr8f40saljMIpy7M0",
       "type": "Feature",
-      "properties": {
-        "id": "M-10",
-        "name": "Macrolote M-10",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 10 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -414,18 +326,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-11",
+      "id": "LNQTT1EGOGGTb5xFh5C2K6GHuOmkv2Yd",
       "type": "Feature",
-      "properties": {
-        "id": "M-11",
-        "name": "Macrolote M-11",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 11 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -455,18 +358,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-12",
+      "id": "TugOq2W5Rglu60fW2NbJEwCtUmXwMNYk",
       "type": "Feature",
-      "properties": {
-        "id": "M-12",
-        "name": "Macrolote M-12",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 12 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -496,18 +390,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-13",
+      "id": "qPyZGMabiXFgV2O8OUu04GP4z2GfiXJO",
       "type": "Feature",
-      "properties": {
-        "id": "M-13",
-        "name": "Macrolote M-13",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 13 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -537,18 +422,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-14",
+      "id": "8zOLACSh0VXJNGYh7ZUyWYFuDVpMyDFm",
       "type": "Feature",
-      "properties": {
-        "id": "M-14",
-        "name": "Macrolote M-14",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 14 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -578,18 +454,9 @@ export const lotsData: LotFeatureCollection = {
       }
     },
     {
-      "id": "M-15",
+      "id": "i2nqc4TIyfF9iUbitoObn7C1cQNTM7oO",
       "type": "Feature",
-      "properties": {
-        "id": "M-15",
-        "name": "Macrolote M-15",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 15 del proyecto DUNAH.",
-        "groupId": "dunah",
-        "zoneType": "main-lot"
-      },
+      "properties": {},
       "geometry": {
         "coordinates": [
           [
@@ -617,110 +484,26 @@ export const lotsData: LotFeatureCollection = {
         ],
         "type": "Polygon"
       }
-    },
-    {
-      "id": "Q-1",
-      "type": "Feature",
-      "properties": {
-        "id": "Q-1",
-        "name": "Lote Q-1",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 1 del proyecto El Quelele.",
-        "groupId": "el-quelele",
-        "zoneType": "main-lot"
-      },
-      "geometry": {
-        "coordinates": [
-          [
-            [-110.51821790029366, 24.196399389473513],
-            [-110.51800811752794, 24.196793749196388],
-            [-110.51824211875685, 24.196862087476546],
-            [-110.51843597213728, 24.196450559875355],
-            [-110.51821790029366, 24.196399389473513]
-          ]
-        ],
-        "type": "Polygon"
-      }
-    },
-    {
-      "id": "Q-2",
-      "type": "Feature",
-      "properties": {
-        "id": "Q-2",
-        "name": "Lote Q-2",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 2 del proyecto El Quelele.",
-        "groupId": "el-quelele",
-        "zoneType": "main-lot"
-      },
-      "geometry": {
-        "coordinates": [
-          [
-            [-110.5184367686902, 24.196448287893233],
-            [-110.51824390939632, 24.196872624140696],
-            [-110.51849444092882, 24.196940783066367],
-            [-110.51866400053058, 24.196504635656154],
-            [-110.5184367686902, 24.196448287893233]
-          ]
-        ],
-        "type": "Polygon"
-      }
-    },
-    {
-      "id": "Q-3",
-      "type": "Feature",
-      "properties": {
-        "id": "Q-3",
-        "name": "Lote Q-3",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 3 del proyecto El Quelele.",
-        "groupId": "el-quelele",
-        "zoneType": "main-lot"
-      },
-      "geometry": {
-        "coordinates": [
-          [
-            [-110.51849105623457, 24.196934787735785],
-            [-110.51866559458537, 24.196500094313933],
-            [-110.51892767767293, 24.196566620116982],
-            [-110.5187515452668, 24.197005854636444],
-            [-110.51849105623457, 24.196934787735785]
-          ]
-        ],
-        "type": "Polygon"
-      }
-    },
-    {
-      "id": "Q-4",
-      "type": "Feature",
-      "properties": {
-        "id": "Q-4",
-        "name": "Lote Q-4",
-        "status": "available",
-        "area": "Por definir m²",
-        "price": "Consultar",
-        "description": "Lote 4 del proyecto El Quelele.",
-        "groupId": "el-quelele",
-        "zoneType": "main-lot"
-      },
-      "geometry": {
-        "coordinates": [
-          [
-            [-110.51893604111682, 24.196574069473883],
-            [-110.51919473950957, 24.196634599893642],
-            [-110.51899888868918, 24.197083096134335],
-            [-110.51874337840708, 24.19701348328074],
-            [-110.51893604111682, 24.196574069473883]
-          ]
-        ],
-        "type": "Polygon"
-      }
     }
   ]
-} as unknown as LotFeatureCollection;
+};
+
+// Map each feature to have basic properties using its array index + 1
+userFeatures.features.forEach((feature, index) => {
+  const lotNumber = index + 1;
+  feature.properties = {
+    id: feature.id || `lote-${lotNumber}`,
+    name: `Lote ${lotNumber}`,
+    status: 'available',
+    area: 'Por definir m²',
+    price: 'Consultar',
+    description: `Lote ${lotNumber} del proyecto DUNAH.`,
+    groupId: 'dunah',
+    zoneType: 'main-lot'
+  };
+});
+
+const newContent = "import { LotFeatureCollection } from '@/components/maps/mapTypes';\n\nexport const lotsData: LotFeatureCollection = " + JSON.stringify(userFeatures, null, 2) + " as unknown as LotFeatureCollection;\n";
+
+fs.writeFileSync(lotsFile, newContent);
+console.log("Success! Updated 15 lots.");

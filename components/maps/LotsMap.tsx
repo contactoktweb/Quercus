@@ -1,12 +1,16 @@
 'use client';
 
 import { useState, useMemo, useCallback, useRef } from 'react';
-import Map, { Source, Layer, MapLayerMouseEvent } from 'react-map-gl/maplibre';
+import Map, { Source, Layer, MapLayerMouseEvent, FullscreenControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { baseFillLayer, borderLayer, hoverHighlightLayer, selectedBorderLayer, hitTestLayer } from './mapLayers';
 import { lotsData } from '@/data/lots';
 import { LotProperties } from './mapTypes';
 import { LotTooltip } from './LotTooltip';
+import { dunahKmlGeoJson } from './dunahKml';
+import { queleleKmlGeoJson } from './queleleKml';
+import { quintaesenciaKmlGeoJson } from './quintaesenciaKml';
+import DrawControl from './DrawControl';
 
 export interface LotsMapProps {
   onSelectLot?: (lot: LotProperties | null) => void;
@@ -48,6 +52,30 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
   const showTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [selectedLot, setSelectedLot] = useState<LotProperties | null>(null);
+  
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editorMode, setEditorMode] = useState<'draw_polygon' | 'simple_select'>('draw_polygon');
+  const [drawnFeatures, setDrawnFeatures] = useState<any>({});
+  
+  const onUpdateDraw = useCallback((e: any) => {
+    setDrawnFeatures((curr: any) => {
+      const newFeatures = { ...curr };
+      for (const f of e.features) {
+        newFeatures[f.id] = f;
+      }
+      return newFeatures;
+    });
+  }, []);
+
+  const onDeleteDraw = useCallback((e: any) => {
+    setDrawnFeatures((curr: any) => {
+      const newFeatures = { ...curr };
+      for (const f of e.features) {
+        delete newFeatures[f.id];
+      }
+      return newFeatures;
+    });
+  }, []);
 
   const clearShow = () => {
     if (showTimeoutRef.current) { clearTimeout(showTimeoutRef.current); showTimeoutRef.current = null; }
@@ -93,6 +121,7 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
   }, []);
 
   const onClick = useCallback((event: MapLayerMouseEvent) => {
+    if (isEditMode) return; // Prevent losing selection/interaction logic during edit mode
     const { features } = event;
     const clickedFeature = features && features[0];
     if (clickedFeature && clickedFeature.properties) {
@@ -103,7 +132,7 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
       setSelectedLot(null);
       if (onSelectLot) onSelectLot(null);
     }
-  }, [onSelectLot]);
+  }, [onSelectLot, isEditMode]);
 
   // Filtros dinámicos para Hover (Highlight By Filter)
   const hoverFilter = useMemo(() => {
@@ -111,7 +140,7 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
 
     // Solo resaltamos el lote individual sobre el que estamos parados
     const properties = hoveredFeature.properties as LotProperties | null;
-    if (!properties) return ['in', 'id', ''];
+    if (!properties || !properties.id) return ['in', 'id', ''];
 
     return ['in', 'id', properties.id];
   }, [hoveredFeature]);
@@ -122,6 +151,80 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
 
   return (
     <div className={className || "w-full h-[600px] md:h-[700px] rounded-2xl overflow-hidden shadow-2xl border border-gray-200 relative bg-gray-50"}>
+      
+      {/* Editor Controls Panel */}
+      <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
+        <div className="flex flex-col bg-gunmetal p-4 rounded-xl shadow-lg border border-silver-sand/20 min-w-[300px]">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-warm-white font-serif text-lg mb-1">Mapa Interactivo</h3>
+              <p className="text-silver-sand/60 text-sm">
+                {isEditMode ? 'Edición de polígonos.' : 'Pasa el cursor por las zonas para ver detalles.'}
+              </p>
+            </div>
+            <button
+              onClick={() => setIsEditMode(!isEditMode)}
+              className={`ml-4 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors ${
+                isEditMode ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-khaki text-gunmetal hover:bg-khaki/80'
+              }`}
+            >
+              {isEditMode ? 'Salir Edición' : 'Modo Editor'}
+            </button>
+          </div>
+          
+          {isEditMode && (
+            <div className="flex flex-col gap-2 mt-4 pt-3 border-t border-silver-sand/20">
+               <div className="flex items-center gap-2">
+                 <button
+                   onClick={() => setEditorMode('draw_polygon')}
+                   className={`flex-1 px-3 py-2 text-xs font-bold uppercase tracking-wider rounded transition-colors ${editorMode === 'draw_polygon' ? 'bg-khaki text-gunmetal' : 'bg-black/40 text-warm-white hover:bg-silver-sand/20'}`}
+                 >
+                   ✏️ Dibujar
+                 </button>
+                 <button
+                   onClick={() => setEditorMode('simple_select')}
+                   className={`flex-1 px-3 py-2 text-xs font-bold uppercase tracking-wider rounded transition-colors ${editorMode === 'simple_select' ? 'bg-khaki text-gunmetal' : 'bg-black/40 text-warm-white hover:bg-silver-sand/20'}`}
+                 >
+                   👆 Seleccionar
+                 </button>
+               </div>
+               
+               {editorMode === 'simple_select' && (
+                 <button
+                   onClick={() => window.dispatchEvent(new CustomEvent('draw-trash'))}
+                   className="w-full mt-1 px-3 py-2 text-xs font-bold uppercase tracking-wider rounded transition-colors bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white border border-red-500/30"
+                 >
+                   🗑️ Eliminar Lote Seleccionado
+                 </button>
+               )}
+            </div>
+          )}
+        </div>
+        
+        {isEditMode && Object.keys(drawnFeatures).length > 0 && (
+          <div className="bg-gunmetal p-4 rounded-xl shadow-lg border border-silver-sand/20 w-full max-w-[400px]">
+            <div className="flex justify-between items-center mb-2">
+               <h4 className="text-khaki font-serif text-sm">GeoJSON Generado</h4>
+               <button 
+                 onClick={() => {
+                   const fc = { type: 'FeatureCollection', features: Object.values(drawnFeatures) };
+                   navigator.clipboard.writeText(JSON.stringify(fc, null, 2));
+                   alert('GeoJSON copiado');
+                 }}
+                 className="bg-warm-white text-gunmetal px-2 py-1 text-xs font-bold uppercase tracking-wider hover:bg-silver-sand transition-colors rounded"
+               >
+                 Copiar
+               </button>
+            </div>
+            <textarea
+               readOnly
+               value={JSON.stringify({ type: 'FeatureCollection', features: Object.values(drawnFeatures) }, null, 2)}
+               className="w-full h-32 bg-black/50 text-[#4ade80] font-mono text-[10px] p-2 rounded-lg focus:outline-none border border-silver-sand/10 resize-none"
+            />
+          </div>
+        )}
+      </div>
+
       {/* Inyectamos CSS global para forzar que el popup NUNCA robe el clic del mouse */}
       <style dangerouslySetInnerHTML={{__html: `
         .maplibregl-popup, .mapboxgl-popup {
@@ -131,9 +234,9 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
       
       <Map
         initialViewState={{
-          longitude: -110.7059, // Coordenada central del nuevo polígono
-          latitude: 23.8060,
-          zoom: 14,
+          longitude: projectSlug === 'el-quelele' ? -110.5185 : projectSlug === 'quintaesencia' ? -110.517 : -110.7059,
+          latitude: projectSlug === 'el-quelele' ? 24.1975 : projectSlug === 'quintaesencia' ? 24.179 : 23.8060,
+          zoom: projectSlug === 'el-quelele' ? 16 : projectSlug === 'quintaesencia' ? 14 : 14,
           pitch: 0, // Vista 2D
           bearing: 0 // Vista norte arriba
         }}
@@ -166,6 +269,7 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
         onMouseMove={onHover}
         onClick={onClick}
         onMouseLeave={() => {
+          if (isEditMode) return;
           clearShow();
           clearHide();
           hoveredIdRef.current = null;
@@ -174,43 +278,112 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
         }}
         cursor={hoveredFeature ? 'pointer' : 'grab'}
       >
+        <FullscreenControl position="bottom-right" />
+        
+        {isEditMode && (
+          <DrawControl
+            position="top-right"
+            displayControlsDefault={false}
+            controls={{
+              polygon: true,
+              trash: true
+            }}
+            drawMode={editorMode}
+            onModeChange={(m) => {
+               if (m === 'draw_polygon' || m === 'simple_select') {
+                 setEditorMode(m);
+               }
+            }}
+            initialFeatures={lotsData as any}
+            onCreate={onUpdateDraw}
+            onUpdate={onUpdateDraw}
+            onDelete={onDeleteDraw}
+          />
+        )}
         {projectSlug === 'dunah' && (
-          <Source 
-            id="dunah-overlay" 
-            type="image" 
-            url="/dunah-map.png"
-            coordinates={[
-              [-110.70848722842591, 23.805388986812932], // top-left
-              [-110.70015563621189, 23.797131696161504], // top-right
-              [-110.70582821433128, 23.792340075688564], // bottom-right
-              [-110.71415980654531, 23.800597366339993]  // bottom-left
-            ]}
-          >
-            <Layer 
-              id="dunah-overlay-layer" 
-              type="raster" 
-              beforeId="lot-hit"
-              paint={{ 'raster-opacity': 0.85 }} 
+          <Source id="dunah-kml-source" type="geojson" data={dunahKmlGeoJson as any}>
+            <Layer
+              id="dunah-kml-line"
+              type="line"
+              paint={{
+                'line-color': '#22c55e',
+                'line-width': 2,
+                'line-dasharray': [2, 2]
+              }}
+            />
+            <Layer
+              id="dunah-kml-fill"
+              type="fill"
+              paint={{
+                'fill-color': '#22c55e',
+                'fill-opacity': 0.1
+              }}
+            />
+          </Source>
+        )}
+        
+        {projectSlug === 'el-quelele' && (
+          <Source id="quelele-kml-source" type="geojson" data={queleleKmlGeoJson as any}>
+            <Layer
+              id="quelele-kml-line"
+              type="line"
+              paint={{
+                'line-color': '#22c55e',
+                'line-width': 2,
+                'line-dasharray': [2, 2]
+              }}
+            />
+            <Layer
+              id="quelele-kml-fill"
+              type="fill"
+              paint={{
+                'fill-color': '#22c55e',
+                'fill-opacity': 0.1
+              }}
+            />
+          </Source>
+        )}
+        
+        {projectSlug === 'quintaesencia' && (
+          <Source id="quintaesencia-kml-source" type="geojson" data={quintaesenciaKmlGeoJson as any}>
+            <Layer
+              id="quintaesencia-kml-line"
+              type="line"
+              paint={{
+                'line-color': '#22c55e',
+                'line-width': 2,
+                'line-dasharray': [2, 2]
+              }}
+            />
+            <Layer
+              id="quintaesencia-kml-fill"
+              type="fill"
+              paint={{
+                'fill-color': '#22c55e',
+                'fill-opacity': 0.1
+              }}
             />
           </Source>
         )}
 
-        <Source type="geojson" data={lotsData}>
-          {/* 1. Capa base de relleno con baja opacidad */}
-          <Layer {...baseFillLayer} />
+        {!isEditMode && (
+          <Source type="geojson" data={lotsData}>
+            {/* 1. Capa base de relleno con baja opacidad */}
+            <Layer {...baseFillLayer} />
 
-          {/* 2. Capa base de bordes */}
-          <Layer {...borderLayer} />
+            {/* 2. Capa base de bordes */}
+            <Layer {...borderLayer} />
 
-          {/* 3. Highlight al hacer hover */}
-          <Layer {...hoverHighlightLayer} filter={hoverFilter} />
+            {/* 3. Highlight al hacer hover */}
+            <Layer {...hoverHighlightLayer} filter={hoverFilter} />
 
-          {/* 4. Borde dorado para el lote seleccionado */}
-          <Layer {...selectedBorderLayer} filter={filterSelect} />
+            {/* 4. Borde dorado para el lote seleccionado */}
+            <Layer {...selectedBorderLayer} filter={filterSelect} />
 
-          {/* 5. Capa INVISIBLE encima de todo — única fuente de eventos de mouse */}
-          <Layer {...hitTestLayer} />
-        </Source>
+            {/* 5. Capa INVISIBLE encima de todo — única fuente de eventos de mouse */}
+            <Layer {...hitTestLayer} />
+          </Source>
+        )}
 
         {/* Renderizado del Popup de Hover */}
         {hoveredFeature && hoveredFeature.properties && hoverLngLat && (
