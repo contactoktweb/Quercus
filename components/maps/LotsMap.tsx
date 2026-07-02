@@ -72,6 +72,13 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
     [-110.71710045270571, 23.8054396118674]  // bottom-left
   ]);
   
+  const [queleleImgCoords, setQueleleImgCoords] = useState<[[number, number], [number, number], [number, number], [number, number]]>([
+    [-110.52013342247271, 24.198945723894923], // top-left
+    [-110.51599195795393, 24.19775905835681], // top-right
+    [-110.51690308014788, 24.195102133096967], // bottom-right
+    [-110.52123091057005, 24.196609920918107]  // bottom-left
+  ]);
+  
   const [hasEditorAccess, setHasEditorAccess] = useState(false);
 
   useEffect(() => {
@@ -216,7 +223,7 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
                  >
                    🟩 Lotes
                  </button>
-                 {projectSlug === 'dunah' && (
+                 {(projectSlug === 'dunah' || projectSlug === 'el-quelele') && (
                    <button
                      onClick={() => setEditTarget('imagen')}
                      className={`flex-1 px-3 py-1.5 text-xs font-bold uppercase tracking-wider rounded transition-colors ${editTarget === 'imagen' ? 'bg-khaki text-gunmetal shadow-md' : 'text-warm-white hover:bg-silver-sand/20'}`}
@@ -256,12 +263,13 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
 
                
                
-               {isEditMode && editTarget === 'imagen' && projectSlug === 'dunah' && (
+               {isEditMode && editTarget === 'imagen' && (projectSlug === 'dunah' || projectSlug === 'el-quelele') && (
                  <button 
                    onClick={() => {
-                     navigator.clipboard.writeText(JSON.stringify(dunahImgCoords, null, 2));
-                     alert('Coordenadas de imagen copiadas al portapapeles. ¡Mira también la consola!');
-                     console.log('Nuevas coordenadas de imagen DUNAH:', JSON.stringify(dunahImgCoords, null, 2));
+                     const coordsToCopy = projectSlug === 'dunah' ? dunahImgCoords : queleleImgCoords;
+                     navigator.clipboard.writeText(JSON.stringify(coordsToCopy, null, 2));
+                     alert(`Coordenadas de imagen copiadas al portapapeles. ¡Mira también la consola!`);
+                     console.log(`Nuevas coordenadas de imagen ${projectSlug.toUpperCase()}:`, JSON.stringify(coordsToCopy, null, 2));
                    }}
                    className="w-full mt-2 px-3 py-2 text-xs font-bold uppercase tracking-wider rounded transition-colors bg-blue-500/20 text-blue-400 hover:bg-blue-500 hover:text-white border border-blue-500/30"
                  >
@@ -422,25 +430,56 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
         )}
         
         {projectSlug === 'el-quelele' && (
-          <Source id="quelele-kml-source" type="geojson" data={queleleKmlGeoJson as any}>
-            <Layer
-              id="quelele-kml-line"
-              type="line"
-              paint={{
-                'line-color': '#22c55e',
-                'line-width': 2,
-                'line-dasharray': [2, 2]
-              }}
-            />
-            <Layer
-              id="quelele-kml-fill"
-              type="fill"
-              paint={{
-                'fill-color': '#22c55e',
-                'fill-opacity': 0.1
-              }}
-            />
-          </Source>
+          <>
+            <Source 
+              id="quelele-image-source" 
+              type="image" 
+              url="/QUELELE.jpg" 
+              coordinates={queleleImgCoords}
+            >
+              <Layer
+                id="quelele-image-layer"
+                type="raster"
+                paint={{
+                  'raster-opacity': 1,
+                  'raster-fade-duration': 0
+                }}
+              />
+            </Source>
+            <Source id="quelele-kml-source" type="geojson" data={queleleKmlGeoJson as any}>
+              <Layer
+                id="quelele-kml-line"
+                type="line"
+                paint={{
+                  'line-color': '#22c55e',
+                  'line-width': 2,
+                  'line-dasharray': [2, 2]
+                }}
+              />
+              <Layer
+                id="quelele-kml-fill"
+                type="fill"
+                paint={{
+                  'fill-color': '#22c55e',
+                  'fill-opacity': 0
+                }}
+              />
+            </Source>
+            {isEditMode && editTarget === 'imagen' && queleleImgCoords.map((coord, index) => (
+              <Marker
+                key={`corner-quelele-${index}`}
+                longitude={coord[0]}
+                latitude={coord[1]}
+                draggable
+                onDrag={(e) => {
+                  const newCoords = [...queleleImgCoords] as [[number, number], [number, number], [number, number], [number, number]];
+                  newCoords[index] = [e.lngLat.lng, e.lngLat.lat];
+                  setQueleleImgCoords(newCoords);
+                }}
+                color={['#ff0000', '#00ff00', '#0000ff', '#eab308'][index]}
+              />
+            ))}
+          </>
         )}
         
         {projectSlug === 'quintaesencia' && (
