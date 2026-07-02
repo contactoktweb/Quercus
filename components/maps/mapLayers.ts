@@ -18,7 +18,7 @@ export const baseFillLayer: FillLayer = {
       ['==', ['get', 'status'], 'reserved'], statusColors.reserved,
       statusColors.occupied
     ],
-    'fill-opacity': 0.4
+    'fill-opacity': 0
   }
 };
 
@@ -53,7 +53,22 @@ export const hoverHighlightLayer: FillLayer = {
       ['==', ['get', 'status'], 'reserved'], statusColors.reserved,
       statusColors.occupied
     ],
-    'fill-opacity': 0.9 // Más opaco al hacer hover para resaltar
+    'fill-opacity': 0.3 // Hover muy tenue
+  }
+};
+
+// Capa de relleno para el lote seleccionado
+export const selectedFillLayer: FillLayer = {
+  id: 'lot-selected-fill',
+  type: 'fill',
+  paint: {
+    'fill-color': [
+      'case',
+      ['==', ['get', 'status'], 'available'], statusColors.available,
+      ['==', ['get', 'status'], 'reserved'], statusColors.reserved,
+      statusColors.occupied
+    ],
+    'fill-opacity': 0.8
   }
 };
 

@@ -187,60 +187,39 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveM
   }
 
   return (
-    <div className="grid lg:grid-cols-[1fr_350px] gap-8">
+    <div className="relative w-full">
       {/* Map Area */}
-      <div className="relative min-w-0 w-full">
-        {/* Master Plan Map */}
-        <div 
-          className="relative h-[650px] lg:h-auto lg:aspect-[4/3] bg-rifle-green/5 border border-silver-sand/10 overflow-hidden"
-        >
-          {projectSlug === 'quintaesencia' ? (
-            <InteractiveImageMap 
-              imageUrl="/quintaesencia.png"
-              lots={projectLots}
-              onSelectLot={handleLotClick}
-              className="w-full h-full"
-            />
-          ) : (
-            <LotsMap 
-              hideSidebar 
-              className="w-full h-full"
-              onSelectLot={handleLotClick}
-              projectSlug={projectSlug}
-            />
-          )}
-        </div>
+      <div className="relative w-full h-[650px] lg:h-[750px] bg-rifle-green/5 border border-silver-sand/10 overflow-hidden rounded-2xl shadow-2xl">
+        {projectSlug === 'quintaesencia' ? (
+          <InteractiveImageMap 
+            imageUrl="/quintaesencia.png"
+            lots={projectLots}
+            onSelectLot={handleLotClick}
+            className="w-full h-full"
+          />
+        ) : (
+          <LotsMap 
+            hideSidebar 
+            className="w-full h-full"
+            onSelectLot={handleLotClick}
+            projectSlug={projectSlug}
+          />
+        )}
       </div>
 
-      {/* Detail Panel */}
-      <div className="lg:min-h-[400px]">
-        <AnimatePresence mode="wait">
-          {selectedLot ? (
+      {/* Detail Panel Overlay */}
+      <AnimatePresence>
+        {selectedLot && (
+          <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-full max-w-[320px] md:max-w-[360px]">
             <LotDetailPanel 
               key={selectedLot.id}
               lot={selectedLot} 
               onClose={handleClose}
               onRequestInfo={handleRequestInfo}
             />
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="h-full flex items-center justify-center bg-gunmetal/50 border border-silver-sand/10 p-8"
-            >
-              <div className="text-center">
-                <svg className="w-12 h-12 mx-auto mb-4 text-silver-sand/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122" />
-                </svg>
-                <p className="text-silver-sand/60 text-sm">
-                  Selecciona un lote en el mapa para ver sus detalles
-                </p>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
