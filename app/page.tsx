@@ -22,7 +22,7 @@ export default async function Home() {
 
   return (
     <main className="overflow-x-hidden">
-      <Header />
+      <Header config={configData} />
       <Hero data={homeData} />
       <EditorialIntro data={homeData} />
       <InteractiveProjects projects={projectsData} />

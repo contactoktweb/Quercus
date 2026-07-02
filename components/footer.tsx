@@ -34,7 +34,7 @@ export function Footer({ config }: { config?: any }) {
           {/* Brand */}
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-3">
-              <img src="/logos/Recurso 9 (1).png" alt="Quercus Logo" className="h-8 object-contain" />
+              <img src={config?.logo?.asset?.url || "/logos/Recurso 9 (1).png"} alt={config?.logo?.alt || "Quercus Logo"} className="h-8 object-contain" />
               <span className="sr-only">QUERCUS</span>
             </Link>
             <p className="mt-6 text-silver-sand/70 text-sm leading-relaxed max-w-xs">

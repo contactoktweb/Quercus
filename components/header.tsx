@@ -15,11 +15,13 @@ const navItems = [
 const bcsProjects = getProjectsByRegion('baja-california-sur')
 const michoacanProjects = getProjectsByRegion('michoacan')
 
-export function Header() {
+export function Header({ config }: { config?: any }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false)
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false)
+
+  const logoUrl = config?.logo?.asset?.url
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,16 +50,28 @@ export function Header() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3 group">
               <div className="relative w-40 h-10 md:w-48 md:h-12">
-                <img 
-                  src="/logos/Recurso 14.png" 
-                  alt="Quercus Logo" 
-                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${isScrolled || isMegaMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
-                />
-                <img 
-                  src="/logos/Recurso 9 (1).png" 
-                  alt="Quercus Logo" 
-                  className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${isScrolled || isMegaMenuOpen ? 'opacity-0' : 'opacity-100'}`} 
-                />
+                {logoUrl ? (
+                  <img 
+                    src={logoUrl} 
+                    alt={config?.logo?.alt || "Quercus Logo"} 
+                    className={`absolute inset-0 w-full h-full object-contain transition-all duration-500 ${
+                      isScrolled || isMegaMenuOpen ? 'brightness-0' : ''
+                    }`} 
+                  />
+                ) : (
+                  <>
+                    <img 
+                      src="/logos/Recurso 14.png" 
+                      alt="Quercus Logo" 
+                      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${isScrolled || isMegaMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
+                    />
+                    <img 
+                      src="/logos/Recurso 9 (1).png" 
+                      alt="Quercus Logo" 
+                      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${isScrolled || isMegaMenuOpen ? 'opacity-0' : 'opacity-100'}`} 
+                    />
+                  </>
+                )}
               </div>
               <span className="sr-only">QUERCUS</span>
             </Link>

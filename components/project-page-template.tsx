@@ -14,6 +14,8 @@ import { Project } from '@/lib/projects-data'
 
 interface ProjectPageTemplateProps {
   project: Project
+  sanityLots?: any[]
+  config?: any
 }
 
 function HeroSection({ project }: { project: Project }) {
@@ -179,14 +181,14 @@ function AmenitiesSection({ project }: { project: Project }) {
 }
 
 
-export function ProjectPageTemplate({ project, sanityLots = [] }: ProjectPageTemplateProps) {
+export function ProjectPageTemplate({ project, sanityLots = [], config }: ProjectPageTemplateProps) {
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null)
 
   const showMasterPlan = ['dunah', 'el-quelele', 'quintaesencia'].includes(project.slug)
 
   return (
     <main className="overflow-x-hidden">
-      <Header />
+      <Header config={config} />
       <HeroSection project={project} />
       <StatsSection project={project} />
       
@@ -256,7 +258,7 @@ export function ProjectPageTemplate({ project, sanityLots = [] }: ProjectPageTem
         </div>
       </section>
 
-      <Footer />
+      <Footer config={config} />
     </main>
   )
 }

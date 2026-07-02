@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { ProjectPageTemplate } from '@/components/project-page-template'
 import { projectsData, getProjectBySlug } from '@/lib/projects-data'
-import { sanityFetch, PROJECT_BY_SLUG_QUERY, ALL_PROJECTS_QUERY } from '@/sanity/lib/queries'
+import { sanityFetch, PROJECT_BY_SLUG_QUERY, ALL_PROJECTS_QUERY, GLOBAL_CONFIG_QUERY } from '@/sanity/lib/queries'
 
 export async function generateStaticParams() {
   try {
@@ -59,17 +59,24 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     notFound()
   }
 
-  // Fetch lots
+  // Fetch lots & config
   let sanityLots: any[] = []
+  let configData: any = null
   if (project._id) {
     const { LOTS_BY_PROJECT_QUERY } = await import('@/sanity/lib/queries')
-    sanityLots = await sanityFetch<any[]>({ query: LOTS_BY_PROJECT_QUERY, params: { projectId: project._id } })
+    const [lots, config] = await Promise.all([
+      sanityFetch<any[]>({ query: LOTS_BY_PROJECT_QUERY, params: { projectId: project._id } }),
+      sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY })
+    ])
+    sanityLots = lots
+    configData = config
   }
 
   return (
     <ProjectPageTemplate 
       project={project} 
       sanityLots={sanityLots}
+      config={configData}
     />
   )
 }
