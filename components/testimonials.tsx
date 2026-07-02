@@ -4,34 +4,36 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState, useEffect, useCallback } from 'react'
 
-const testimonials = [
+const defaultTestimonials = [
   {
     quote: "Encontramos en Quercus algo más que un terreno. Fue la posibilidad de construir un refugio conectado con la naturaleza y con una comunidad que comparte nuestra visión.",
-    name: "Mariana & Andrés",
-    project: "Quercus Baja",
+    author: "Mariana & Andrés",
+    role: "Propietarios en Quercus Baja",
   },
   {
     quote: "Lo que más nos atrajo fue la tranquilidad del entorno, la baja densidad y la forma en que cada proyecto respeta el paisaje.",
-    name: "Carlos R.",
-    project: "El Quelele",
+    author: "Carlos R.",
+    role: "Propietario en El Quelele",
   },
   {
     quote: "DUNAH representa exactamente lo que buscábamos: naturaleza, bienestar y una oportunidad de crear algo con propósito a largo plazo.",
-    name: "Valeria M.",
-    project: "DUNAH",
+    author: "Valeria M.",
+    role: "Propietaria en DUNAH",
   },
   {
     quote: "Cada visita nos confirmó que no era solo una inversión, sino una decisión de vida.",
-    name: "Sofía L.",
-    project: "Elemental",
+    author: "Sofía L.",
+    role: "Propietaria en Elemental",
   },
 ]
 
-export function Testimonials() {
+export function Testimonials({ data }: { data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [currentIndex, setCurrentIndex] = useState(0)
   const [direction, setDirection] = useState(0)
+
+  const testimonials = data?.testimonials?.length ? data.testimonials : defaultTestimonials
 
   const paginate = useCallback((newDirection: number) => {
     setDirection(newDirection)
@@ -41,7 +43,7 @@ export function Testimonials() {
       if (next >= testimonials.length) next = 0
       return next
     })
-  }, [])
+  }, [testimonials.length])
 
   // Auto-advance
   useEffect(() => {
@@ -123,11 +125,11 @@ export function Testimonials() {
                 {/* Attribution */}
                 <div className="mt-10 flex flex-col items-center gap-2">
                   <div className="w-12 h-px bg-khaki" />
-                  <p className="text-gunmetal font-medium mt-4">
-                    {testimonials[currentIndex].name}
-                  </p>
-                  <p className="text-rifle-green/60 text-sm">
-                    {testimonials[currentIndex].project}
+                  <h4 className="font-serif text-xl md:text-2xl text-gunmetal mb-1">
+                    {testimonials[currentIndex].author}
+                  </h4>
+                  <p className="text-sm md:text-base text-gunmetal/60 tracking-luxury uppercase">
+                    {testimonials[currentIndex].role}
                   </p>
                 </div>
               </motion.div>
@@ -149,7 +151,7 @@ export function Testimonials() {
 
             {/* Dots */}
             <div className="flex gap-3">
-              {testimonials.map((_, index) => (
+              {testimonials.map((_: any, index: number) => (
                 <button
                   key={index}
                   onClick={() => {
@@ -190,9 +192,9 @@ export function Testimonials() {
           transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
           className="hidden lg:grid grid-cols-3 gap-8 mt-24"
         >
-          {testimonials.slice(0, 3).map((testimonial, index) => (
+          {testimonials.slice(0, 3).map((testimonial: any, index: number) => (
             <motion.div
-              key={testimonial.name}
+              key={testimonial.author}
               initial={{ opacity: 0, y: 30 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.8, delay: 0.5 + index * 0.1 }}
@@ -212,8 +214,8 @@ export function Testimonials() {
 
               {/* Attribution */}
               <div className="pt-6 border-t border-silver-sand/30">
-                <p className="text-gunmetal font-medium text-sm">{testimonial.name}</p>
-                <p className="text-rifle-green/60 text-xs mt-1">{testimonial.project}</p>
+                <h4 className="font-serif text-lg text-gunmetal mb-1">{testimonial.author}</h4>
+                <p className="text-sm text-gunmetal/60 tracking-luxury uppercase">{testimonial.role}</p>
               </div>
 
               {/* Hover accent line */}

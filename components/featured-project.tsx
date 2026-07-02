@@ -4,17 +4,27 @@ import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
 import Link from 'next/link'
+import { projectsData } from '@/lib/projects-data'
 
-const highlights = [
+const defaultHighlights = [
   { label: '1.4 km', desc: 'de playa prístina' },
   { label: '1 hora', desc: 'de La Paz' },
   { label: 'Wellness', desc: 'enfoque holístico' },
   { label: 'Valor', desc: 'a largo plazo' },
 ]
 
-export function FeaturedProject() {
+export function FeaturedProject({ projects, data }: { projects?: any[], data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+
+  const safeProjects = projects?.length ? projects : projectsData
+  // Priority: data.featuredProject, dunah, or just first project
+  const project = data?.featuredProject || safeProjects.find((p: any) => p.slug === 'dunah') || safeProjects[0]
+
+  if (!project) return null
+
+  const imageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop'
+  const highlights = project?.stats || defaultHighlights
 
   return (
     <section ref={ref} className="relative min-h-screen flex items-center">
@@ -22,9 +32,7 @@ export function FeaturedProject() {
       <div className="absolute inset-0">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop')`,
-          }}
+          style={{ backgroundImage: `url('${imageUrl}')` }}
         />
         <div className="absolute inset-0 bg-gunmetal/70" />
       </div>
@@ -41,18 +49,18 @@ export function FeaturedProject() {
             >
               <span className="text-xs tracking-luxury uppercase text-khaki">Proyecto destacado</span>
               <h2 className="mt-6 font-serif text-5xl md:text-6xl lg:text-7xl text-warm-white leading-[1.1]">
-                DUNAH
+                {project.name}
               </h2>
               <p className="mt-2 font-serif text-2xl text-khaki italic">
-                Bienestar en la naturaleza
+                {project.tagline}
               </p>
               <p className="mt-8 text-warm-white/80 leading-relaxed max-w-lg">
-                Una comunidad regenerativa orientada al bienestar, ubicada en un paisaje prístino del Pacífico, creada para retiros, santuarios personales y experiencias de mindfulness.
+                {project.description}
               </p>
 
               {/* Highlights */}
               <div className="mt-12 grid grid-cols-2 sm:grid-cols-4 gap-6">
-                {highlights.map((item, index) => (
+                {highlights.slice(0, 4).map((item: any, index: number) => (
                   <motion.div
                     key={item.label}
                     initial={{ opacity: 0, y: 20 }}
@@ -61,7 +69,7 @@ export function FeaturedProject() {
                     className="border-l border-khaki/30 pl-4"
                   >
                     <div className="font-serif text-2xl text-warm-white">{item.label}</div>
-                    <div className="text-xs text-warm-white/60 mt-1">{item.desc}</div>
+                    <div className="text-xs text-warm-white/60 mt-1">{item.desc || item.value}</div>
                   </motion.div>
                 ))}
               </div>
@@ -74,10 +82,10 @@ export function FeaturedProject() {
                 className="mt-12"
               >
                 <Link
-                  href="#"
+                  href={`/proyectos/${project.slug}`}
                   className="inline-flex items-center gap-3 px-8 py-4 bg-khaki text-gunmetal text-sm tracking-luxury uppercase transition-all duration-500 hover:bg-warm-white group"
                 >
-                  Conocer DUNAH
+                  Conocer {project.name}
                   <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                   </svg>
@@ -95,9 +103,7 @@ export function FeaturedProject() {
               <div className="relative aspect-[3/4]">
                 <div 
                   className="absolute inset-0 bg-cover bg-center"
-                  style={{
-                    backgroundImage: `url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop')`,
-                  }}
+                  style={{ backgroundImage: `url('${imageUrl}')` }}
                 />
                 <div className="absolute -bottom-6 -left-6 w-32 h-32 border border-khaki/30" />
                 <div className="absolute -top-6 -right-6 w-32 h-32 border border-khaki/30" />

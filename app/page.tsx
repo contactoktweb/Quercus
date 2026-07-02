@@ -7,25 +7,33 @@ import { InteractiveProjects } from '@/components/interactive-projects'
 import { FeaturedProject } from '@/components/featured-project'
 import { HistoryTeaser } from '@/components/history-teaser'
 import { Testimonials } from '@/components/testimonials'
-import { Location } from '@/components/location'
+
 import { ContactForm } from '@/components/contact-form'
 import { Footer } from '@/components/footer'
 
-export default function Home() {
+import { sanityFetch, HOME_PAGE_QUERY, GLOBAL_CONFIG_QUERY, ALL_PROJECTS_QUERY } from '@/sanity/lib/queries'
+
+export default async function Home() {
+  const [homeData, configData, projectsData] = await Promise.all([
+    sanityFetch<any>({ query: HOME_PAGE_QUERY }),
+    sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY }),
+    sanityFetch<any[]>({ query: ALL_PROJECTS_QUERY })
+  ])
+
   return (
     <main className="overflow-x-hidden">
       <Header />
-      <Hero />
-      <EditorialIntro />
-      <InteractiveProjects />
-      <FeaturedProject />
+      <Hero data={homeData} />
+      <EditorialIntro data={homeData} />
+      <InteractiveProjects projects={projectsData} />
+      <FeaturedProject projects={projectsData} data={homeData} />
       <ValuesSection />
-      <Pillars />
+      <Pillars data={homeData} />
       <HistoryTeaser />
-      <Testimonials />
-      <Location />
-      <ContactForm />
-      <Footer />
+      <Testimonials data={homeData} />
+
+      <ContactForm data={homeData} config={configData} />
+      <Footer config={configData} />
     </main>
   )
 }

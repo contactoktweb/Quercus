@@ -35,7 +35,7 @@ type FormData = {
 
 type FormErrors = Partial<Record<keyof FormData, string>>
 
-export function ContactForm() {
+export function ContactForm({ data, config }: { data?: any, config?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [step, setStep] = useState(1)
@@ -53,6 +53,9 @@ export function ContactForm() {
   })
 
   const totalSteps = 3
+  
+  const contactTitle = data?.contactTitle || 'Encuentra tu lugar en Quercus'
+  const contactSubtitle = data?.contactSubtitle || 'Gracias por tu interés en los desarrollos de Quercus. Completa tus datos y selecciona el proyecto que te interesa para enviarte información detallada y brindarte atención personalizada.'
 
   const updateField = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -168,10 +171,10 @@ export function ContactForm() {
         >
           <span className="text-xs tracking-luxury uppercase text-khaki">Contacto</span>
           <h2 className="mt-6 font-serif text-4xl md:text-5xl text-warm-white leading-[1.2]">
-            Encuentra tu lugar en Quercus
+            {contactTitle}
           </h2>
           <p className="mt-6 text-warm-white/60 max-w-2xl mx-auto text-sm leading-relaxed">
-            Gracias por tu interés en los desarrollos de Quercus. Completa tus datos y selecciona el proyecto que te interesa para enviarte información detallada y brindarte atención personalizada.
+            {contactSubtitle}
           </p>
         </motion.div>
 

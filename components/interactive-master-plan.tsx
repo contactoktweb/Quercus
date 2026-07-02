@@ -10,6 +10,7 @@ import { LotProperties } from './maps/mapTypes'
 interface InteractiveMasterPlanProps {
   projectSlug: string
   onSelectLot?: (lotId: string | null) => void
+  sanityLots?: any[]
 }
 
 const statusColors: Record<string, { bg: string; border: string; label: string }> = {
@@ -146,9 +147,9 @@ function LotDetailPanel({
   )
 }
 
-export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveMasterPlanProps) {
+export function InteractiveMasterPlan({ projectSlug, onSelectLot, sanityLots = [] }: InteractiveMasterPlanProps) {
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null)
-  const projectLots = getLotsByProject(projectSlug)
+  const projectLots = sanityLots.length > 0 ? sanityLots : getLotsByProject(projectSlug)
 
   const handleLotClick = (lotProps: LotProperties | null) => {
     if (!lotProps) {
@@ -164,8 +165,8 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveM
       status: (lotProps.status || 'available') as any,
       area: lotProps.area || 'N/A',
       price: lotProps.price || 'Consultar',
-      zone: lotProps.zoneType === 'main-lot' ? 'Lote Principal' : 'Sub Zona',
-      view: 'Vista panorámica', // fallback
+      zone: lotProps.zone || (lotProps.zoneType === 'main-lot' ? 'Lote Principal' : 'Sub Zona'),
+      view: lotProps.view || 'Vista panorámica', 
       coordinates: { x: 0, y: 0, width: 0, height: 0 } // Not used by LotsMap
     }
     
@@ -189,7 +190,7 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveM
   return (
     <div className="relative w-full">
       {/* Map Area */}
-      <div className="relative w-full h-[650px] lg:h-[750px] bg-rifle-green/5 border border-silver-sand/10 overflow-hidden rounded-2xl shadow-2xl">
+      <div className={`relative w-full ${projectSlug === 'quintaesencia' ? '' : 'h-[650px] lg:h-[750px] overflow-hidden'} bg-rifle-green/5 border border-silver-sand/10 rounded-2xl shadow-2xl`}>
         {projectSlug === 'quintaesencia' ? (
           <InteractiveImageMap 
             imageUrl="/quintaesencia.png"
@@ -203,23 +204,24 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot }: InteractiveM
             className="w-full h-full"
             onSelectLot={handleLotClick}
             projectSlug={projectSlug}
+            sanityLots={sanityLots}
           />
         )}
-      </div>
 
-      {/* Detail Panel Overlay */}
-      <AnimatePresence>
-        {selectedLot && (
-          <div className="absolute top-4 right-4 md:top-6 md:right-6 z-10 w-full max-w-[320px] md:max-w-[360px]">
-            <LotDetailPanel 
-              key={selectedLot.id}
-              lot={selectedLot} 
-              onClose={handleClose}
-              onRequestInfo={handleRequestInfo}
-            />
-          </div>
-        )}
-      </AnimatePresence>
+        {/* Detail Panel Overlay */}
+        <AnimatePresence>
+          {selectedLot && (
+            <div className={`absolute right-4 md:right-6 z-10 w-full max-w-[320px] md:max-w-[360px] ${projectSlug === 'quintaesencia' ? 'top-28 md:top-32' : 'top-4 md:top-6'}`}>
+              <LotDetailPanel 
+                key={selectedLot.id}
+                lot={selectedLot} 
+                onClose={handleClose}
+                onRequestInfo={handleRequestInfo}
+              />
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }

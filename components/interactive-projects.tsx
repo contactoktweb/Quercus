@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { projectsData, getProjectsByRegion } from '@/lib/projects-data'
+import { projectsData as defaultProjectsData } from '@/lib/projects-data'
 
 type Region = 'baja-california-sur' | 'michoacan'
 
@@ -20,7 +20,7 @@ function ProjectColumn({
   onLeave,
   index 
 }: { 
-  project: typeof projectsData[0]
+  project: any
   isHovered: boolean
   onHover: () => void
   onLeave: () => void
@@ -28,20 +28,25 @@ function ProjectColumn({
 }) {
   const videoRef = useRef<HTMLVideoElement>(null)
 
+  const videoUrl = project?.video?.asset?.url || project?.video || project?.heroVideo?.asset?.url || project?.heroVideo
+  
   const handleMouseEnter = useCallback(() => {
     onHover()
-    if (videoRef.current) {
+    if (videoRef.current && videoUrl) {
       videoRef.current.play().catch(() => {})
     }
-  }, [onHover])
+  }, [onHover, videoUrl])
 
   const handleMouseLeave = useCallback(() => {
     onLeave()
-    if (videoRef.current) {
+    if (videoRef.current && videoUrl) {
       videoRef.current.pause()
       videoRef.current.currentTime = 0
     }
-  }, [onLeave])
+  }, [onLeave, videoUrl])
+
+  const imageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop'
+  const logoUrl = project?.logo?.asset?.url || project?.logo
 
   return (
     <motion.div
@@ -61,14 +66,14 @@ function ProjectColumn({
       <div 
         className="absolute inset-0 bg-cover bg-center transition-transform duration-1000"
         style={{ 
-          backgroundImage: `url('${project.image}')`,
+          backgroundImage: `url('${imageUrl}')`,
           transform: isHovered ? 'scale(1.05)' : 'scale(1)'
         }}
       />
 
       {/* Video (shown on hover) */}
       <AnimatePresence>
-        {isHovered && (
+        {isHovered && videoUrl && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -79,7 +84,7 @@ function ProjectColumn({
             <video
               ref={videoRef}
               className="absolute inset-0 w-full h-full object-cover"
-              src={project.video}
+              src={videoUrl}
               muted
               loop
               playsInline
@@ -112,8 +117,8 @@ function ProjectColumn({
           <motion.div
             className="flex flex-col items-center justify-center"
           >
-            {project.logo ? (
-              <img src={project.logo} alt={project.name} className="h-20 md:h-28 lg:h-32 object-contain" />
+            {logoUrl ? (
+              <img src={logoUrl} alt={project.name} className="h-20 md:h-28 lg:h-32 object-contain" />
             ) : (
               <h3 className="font-serif text-warm-white text-2xl md:text-3xl lg:text-4xl text-center">
                 {project.name}
@@ -177,7 +182,7 @@ function ProjectColumn({
   )
 }
 
-function MobileProjectCard({ project, index }: { project: typeof projectsData[0], index: number }) {
+function MobileProjectCard({ project, index }: { project: any, index: number }) {
   const [isPlaying, setIsPlaying] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -191,6 +196,10 @@ function MobileProjectCard({ project, index }: { project: typeof projectsData[0]
       setIsPlaying(!isPlaying)
     }
   }
+
+  const videoUrl = project?.video?.asset?.url || project?.video || project?.heroVideo?.asset?.url || project?.heroVideo
+  const imageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop'
+  const logoUrl = project?.logo?.asset?.url || project?.logo
 
   return (
     <motion.div
@@ -207,19 +216,21 @@ function MobileProjectCard({ project, index }: { project: typeof projectsData[0]
         {/* Background Image */}
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${project.image}')` }}
+          style={{ backgroundImage: `url('${imageUrl}')` }}
         />
 
         {/* Video */}
-        <video
-          ref={videoRef}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
-          src={project.video}
-          muted
-          loop
-          playsInline
-          preload="metadata"
-        />
+        {videoUrl && (
+          <video
+            ref={videoRef}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}
+            src={videoUrl}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+        )}
 
         {/* Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-soft-black/90 via-soft-black/30 to-transparent" />
@@ -227,8 +238,8 @@ function MobileProjectCard({ project, index }: { project: typeof projectsData[0]
         {/* Content */}
         <div className="absolute inset-0 flex flex-col justify-end p-6">
           <span className="text-warm-white/50 text-xs tracking-luxury mb-2">0{index + 1}</span>
-          {project.logo ? (
-            <img src={project.logo} alt={project.name} className="h-12 object-contain mb-4 self-start" />
+          {logoUrl ? (
+            <img src={logoUrl} alt={project.name} className="h-12 object-contain mb-4 self-start" />
           ) : (
             <h3 className="font-serif text-warm-white text-2xl mb-2">{project.name}</h3>
           )}
@@ -246,32 +257,35 @@ function MobileProjectCard({ project, index }: { project: typeof projectsData[0]
         </div>
 
         {/* Play indicator */}
-        <div className="absolute top-4 right-4">
-          <div className={`w-10 h-10 rounded-full border border-warm-white/30 flex items-center justify-center transition-all duration-300 ${isPlaying ? 'bg-warm-white/20' : 'bg-transparent'}`}>
-            {isPlaying ? (
-              <svg className="w-4 h-4 text-warm-white" fill="currentColor" viewBox="0 0 24 24">
-                <rect x="6" y="4" width="4" height="16" />
-                <rect x="14" y="4" width="4" height="16" />
-              </svg>
-            ) : (
-              <svg className="w-4 h-4 text-warm-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            )}
+        {videoUrl && (
+          <div className="absolute top-4 right-4">
+            <div className={`w-10 h-10 rounded-full border border-warm-white/30 flex items-center justify-center transition-all duration-300 ${isPlaying ? 'bg-warm-white/20' : 'bg-transparent'}`}>
+              {isPlaying ? (
+                <svg className="w-4 h-4 text-warm-white" fill="currentColor" viewBox="0 0 24 24">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
+              ) : (
+                <svg className="w-4 h-4 text-warm-white ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </motion.div>
   )
 }
 
-export function InteractiveProjects() {
+export function InteractiveProjects({ projects }: { projects?: any[] }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
   const [activeRegion, setActiveRegion] = useState<Region>('baja-california-sur')
 
-  const filteredProjects = getProjectsByRegion(activeRegion)
+  const safeProjects = projects?.length ? projects : defaultProjectsData
+  const filteredProjects = safeProjects.filter((p: any) => p.region === activeRegion)
 
   return (
     <section ref={ref} className="bg-soft-black" id="proyectos">
@@ -332,7 +346,7 @@ export function InteractiveProjects() {
           transition={{ duration: 0.5 }}
           className="hidden lg:flex h-[85vh] min-h-[600px] max-h-[900px]"
         >
-          {filteredProjects.map((project, index) => (
+          {filteredProjects.map((project: any, index: number) => (
             <ProjectColumn
               key={project.slug}
               project={project}
@@ -356,7 +370,7 @@ export function InteractiveProjects() {
             transition={{ duration: 0.3 }}
             className="flex gap-4 px-6 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
           >
-            {filteredProjects.map((project, index) => (
+            {filteredProjects.map((project: any, index: number) => (
               <MobileProjectCard key={project.slug} project={project} index={index} />
             ))}
           </motion.div>

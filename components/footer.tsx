@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-const footerLinks = {
+const defaultFooterLinks = {
   comunidades: [
     { name: 'Quercus Baja', href: '#' },
     { name: 'Quercus Elemental', href: '#' },
@@ -21,7 +21,12 @@ const footerLinks = {
   ]
 }
 
-export function Footer() {
+export function Footer({ config }: { config?: any }) {
+  const footerDescription = config?.footerDescription || 'Creando comunidades regenerativas en Baja California Sur.'
+  const socialLinks = config?.socialLinks?.length > 0 
+    ? config.socialLinks.map((link: any) => ({ name: link.platform, href: link.url }))
+    : defaultFooterLinks.social
+
   return (
     <footer className="bg-gunmetal py-20 md:py-32">
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20">
@@ -33,7 +38,7 @@ export function Footer() {
               <span className="sr-only">QUERCUS</span>
             </Link>
             <p className="mt-6 text-silver-sand/70 text-sm leading-relaxed max-w-xs">
-              Creando comunidades regenerativas en Baja California Sur.
+              {footerDescription}
             </p>
             <p className="mt-4 text-silver-sand/50 text-xs">
               Baja California Sur · México
@@ -44,7 +49,7 @@ export function Footer() {
           <div>
             <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6">Comunidades</h3>
             <ul className="space-y-3">
-              {footerLinks.comunidades.map((link) => (
+              {defaultFooterLinks.comunidades.map((link) => (
                 <li key={link.name}>
                   <Link 
                     href={link.href}
@@ -61,7 +66,7 @@ export function Footer() {
           <div>
             <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6">Empresa</h3>
             <ul className="space-y-3">
-              {footerLinks.empresa.map((link) => (
+              {defaultFooterLinks.empresa.map((link) => (
                 <li key={link.name}>
                   <Link 
                     href={link.href}
@@ -78,14 +83,16 @@ export function Footer() {
           <div>
             <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6">Conectar</h3>
             <ul className="space-y-3">
-              {footerLinks.social.map((link) => (
+              {socialLinks.map((link: any) => (
                 <li key={link.name}>
-                  <Link 
+                  <a 
                     href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-silver-sand/70 text-sm hover:text-warm-white transition-colors duration-300"
                   >
                     {link.name}
-                  </Link>
+                  </a>
                 </li>
               ))}
             </ul>

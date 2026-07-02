@@ -25,7 +25,7 @@ function HeroSection({ project }: { project: Project }) {
       <video
         ref={videoRef}
         className="absolute inset-0 w-full h-full object-cover"
-        src={project.heroVideo}
+        src={project.heroVideo?.asset?.url || project.heroVideo}
         autoPlay
         muted
         loop
@@ -122,7 +122,7 @@ function StatsSection({ project }: { project: Project }) {
             transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             className="grid grid-cols-2 gap-8"
           >
-            {project.stats.map((stat, index) => (
+            {(project.stats || []).map((stat: any, index: number) => (
               <div key={stat.label} className="border-t border-silver-sand/30 pt-4">
                 <span className="text-xs tracking-luxury uppercase text-rifle-green/50 block mb-2">
                   {stat.label}
@@ -159,7 +159,7 @@ function AmenitiesSection({ project }: { project: Project }) {
         </motion.div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {project.amenities.map((amenity, index) => (
+          {(project.amenities || []).map((amenity: any, index: number) => (
             <motion.div
               key={amenity}
               initial={{ opacity: 0, y: 20 }}
@@ -176,82 +176,11 @@ function AmenitiesSection({ project }: { project: Project }) {
   )
 }
 
-function LocationSection({ project }: { project: Project }) {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: "-100px" })
 
-  return (
-    <section ref={ref} className="py-20 md:py-28 bg-warm-white">
-      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          {/* Real Google Maps */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="relative aspect-square overflow-hidden bg-rifle-green/10"
-          >
-            <iframe 
-              width="100%" 
-              height="100%" 
-              frameBorder="0" 
-              scrolling="no" 
-              marginHeight={0} 
-              marginWidth={0} 
-              src={`https://maps.google.com/maps?q=${project.coordinates.lat},${project.coordinates.lng}&hl=es&z=13&output=embed`}
-              className="absolute inset-0 border-0"
-              title={`Ubicación de ${project.location}`}
-            />
-            {/* Coordinates */}
-            <div className="absolute bottom-4 left-4 text-xs tracking-luxury text-gunmetal bg-warm-white/90 px-3 py-1.5 backdrop-blur-sm pointer-events-none shadow-sm z-10">
-              {project.coordinates.lat.toFixed(4)}°N, {Math.abs(project.coordinates.lng).toFixed(4)}°W
-            </div>
-          </motion.div>
+export function ProjectPageTemplate({ project, sanityLots = [] }: ProjectPageTemplateProps) {
+  const [selectedLotId, setSelectedLotId] = useState<string | null>(null)
 
-          {/* Info */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <span className="text-xs tracking-luxury uppercase text-khaki mb-6 block">Ubicación</span>
-            <h2 className="font-serif text-3xl md:text-4xl text-gunmetal leading-[1.2] mb-6">
-              {project.location}
-            </h2>
-            <p className="text-rifle-green/70 text-base leading-relaxed font-light mb-8">
-              Ubicado en un entorno natural privilegiado, el proyecto conecta paisaje, tranquilidad y acceso estratégico a los principales puntos de la región.
-            </p>
-
-            {/* Nearby places */}
-            <div className="space-y-4">
-              {project.nearbyPlaces.map((place) => (
-                <div key={place.name} className="flex items-center justify-between py-3 border-b border-silver-sand/30">
-                  <span className="text-gunmetal">{place.name}</span>
-                  <span className="text-rifle-green/50 text-sm">{place.distance}</span>
-                </div>
-              ))}
-            </div>
-
-            <a
-              href={`https://www.google.com/maps?q=${project.coordinates.lat},${project.coordinates.lng}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-khaki text-sm tracking-luxury uppercase mt-8 hover:text-gunmetal transition-colors duration-300"
-            >
-              Ver en Google Maps
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </a>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-export function ProjectPageTemplate({ project }: ProjectPageTemplateProps) {
-  const [selectedLot, setSelectedLot] = useState<string | null>(null)
+  const showMasterPlan = ['dunah', 'el-quelele', 'quintaesencia'].includes(project.slug)
 
   return (
     <main className="overflow-x-hidden">
@@ -262,29 +191,31 @@ export function ProjectPageTemplate({ project }: ProjectPageTemplateProps) {
       <Investment />
 
       {/* Master Plan Section */}
-      <section id="masterplan" className="py-20 md:py-28 bg-soft-black">
-        <div className="max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20">
-          <div className="text-center mb-16">
-            <span className="text-xs tracking-luxury uppercase text-khaki">Master Plan</span>
-            <h2 className="mt-6 font-serif text-3xl md:text-4xl text-warm-white">
-              Explora los lotes disponibles
-            </h2>
-            <p className="mt-4 text-warm-white/60 text-base max-w-xl mx-auto">
-              Descubre los espacios que dan forma a la comunidad. Haz clic en un lote para ver sus detalles.
-            </p>
+      {showMasterPlan && (
+        <section id="masterplan" className="py-20 md:py-28 bg-soft-black">
+          <div className="max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20">
+            <div className="text-center mb-16">
+              <span className="text-xs tracking-luxury uppercase text-khaki">Master Plan</span>
+              <h2 className="mt-6 font-serif text-3xl md:text-4xl text-warm-white">
+                Explora los lotes disponibles
+              </h2>
+              <p className="mt-4 text-warm-white/60 text-base max-w-xl mx-auto">
+                Descubre los espacios que dan forma a la comunidad. Haz clic en un lote para ver sus detalles.
+              </p>
+            </div>
+            <InteractiveMasterPlan 
+              projectSlug={project.slug} 
+              onSelectLot={setSelectedLotId}
+              sanityLots={sanityLots}
+            />
           </div>
-          <InteractiveMasterPlan 
-            projectSlug={project.slug} 
-            onSelectLot={(lotId) => setSelectedLot(lotId)}
-          />
-        </div>
-      </section>
+        </section>
+      )}
 
       <AmenitiesSection project={project} />
-      <LocationSection project={project} />
 
       {/* Gallery Section */}
-      {project.gallery.length > 0 && (
+      {(project.gallery?.length || 0) > 0 && (
         <section className="py-20 md:py-28 bg-warm-white">
           <div className="max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20">
             <div className="text-center mb-16">
@@ -299,7 +230,7 @@ export function ProjectPageTemplate({ project }: ProjectPageTemplateProps) {
       )}
 
       {/* Renders Section */}
-      {project.renders.length > 0 && (
+      {(project.renders?.length || 0) > 0 && (
         <section className="py-20 md:py-28 bg-gunmetal">
           <div className="max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20">
             <div className="text-center mb-16">
@@ -318,7 +249,7 @@ export function ProjectPageTemplate({ project }: ProjectPageTemplateProps) {
         <div className="max-w-[800px] mx-auto px-6 md:px-12 lg:px-20">
           <ProjectContactForm 
             projectName={project.name} 
-            selectedLot={selectedLot}
+            selectedLot={selectedLotId}
           />
         </div>
       </section>

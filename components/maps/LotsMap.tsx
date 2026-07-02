@@ -17,6 +17,7 @@ export interface LotsMapProps {
   className?: string;
   hideSidebar?: boolean;
   projectSlug?: string;
+  sanityLots?: any[];
 }
 
 // Función para determinar el criterio de highlight basado en las propiedades del feature
@@ -44,7 +45,7 @@ function getHighlightFilter(feature: GeoJSON.Feature) {
   };
 }
 
-export default function LotsMap({ onSelectLot, className, hideSidebar = false, projectSlug }: LotsMapProps = {}) {
+export default function LotsMap({ onSelectLot, className, hideSidebar = false, projectSlug, sanityLots = [] }: LotsMapProps = {}) {
   const [hoveredFeature, setHoveredFeature] = useState<GeoJSON.Feature | null>(null);
   const [hoverLngLat, setHoverLngLat] = useState<[number, number] | null>(null);
   const hoveredIdRef   = useRef<string | null>(null);
@@ -58,9 +59,36 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
   const [editorMode, setEditorMode] = useState<'draw_polygon' | 'simple_select'>('draw_polygon');
   const [drawnFeatures, setDrawnFeatures] = useState<any>(() => {
     const initial: any = {};
-    const features = (lotsData as any)?.features || [];
-    for (const f of features) {
-      initial[f.id] = f;
+    if (sanityLots && sanityLots.length > 0) {
+      for (const lot of sanityLots) {
+        try {
+          if (!lot.geoJsonFeature) continue;
+          const feature = typeof lot.geoJsonFeature === 'string' 
+            ? JSON.parse(lot.geoJsonFeature) 
+            : lot.geoJsonFeature;
+            
+          // Ensure we inject sanity properties so they are prioritized over old GeoJSON properties
+          feature.properties = {
+            ...feature.properties,
+            id: lot.lotId,
+            status: lot.status,
+            area: lot.area,
+            price: lot.price,
+            zone: lot.zone,
+            view: lot.view,
+          };
+          feature.id = lot.lotId;
+          initial[lot.lotId] = feature;
+        } catch (err) {
+          console.error("Error parsing lot", lot.lotId, err);
+        }
+      }
+    } else {
+      // Fallback a lotsData estático si no hay en Sanity
+      const features = (lotsData as any)?.features || [];
+      for (const f of features) {
+        initial[f.id] = f;
+      }
     }
     return initial;
   });
@@ -94,11 +122,81 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
       }
     } catch (err) {}
   }, []);
-  
+
+  /**
+   * Guarda los datos del mapa (lotes y/o coordenadas de imagen) en Sanity
+   * a través del API Route seguro del servidor.
+   */
+  const [isSavingToSanity, setIsSavingToSanity] = useState(false);
+
+  const saveToSanity = useCallback(async () => {
+    if (!projectSlug || isSavingToSanity) return;
+    setIsSavingToSanity(true);
+    try {
+      const body: any = { projectSlug };
+
+      // Incluir coordenadas de imagen si aplica
+      if (editTarget === 'imagen' && (projectSlug === 'dunah' || projectSlug === 'el-quelele')) {
+        const imgCoords = projectSlug === 'dunah' ? dunahImgCoords : queleleImgCoords;
+        body.imageCoords = imgCoords;
+      }
+
+      // Incluir lotes si aplica
+      if (editTarget === 'lotes' && Object.keys(drawnFeatures).length > 0) {
+        body.lots = Object.values(drawnFeatures).map((feature: any) => {
+          const lotIdToSave = feature.properties?.id || `LOTE-${Math.floor(1000 + Math.random() * 9000)}`;
+          // Ensure the property is written inside the feature as well
+          if (!feature.properties) feature.properties = {};
+          feature.properties.id = lotIdToSave;
+          
+          return {
+            lotId: lotIdToSave,
+            geoJsonFeature: JSON.stringify(feature),
+            status: feature.properties?.status || 'available',
+            area: feature.properties?.area || 'Consultar',
+            price: feature.properties?.price || 'Consultar',
+            zone: feature.properties?.zone || 'General',
+            view: feature.properties?.view || 'Vista al desarrollo',
+          };
+        });
+      }
+
+      const res = await fetch('/api/sanity/save-map-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(`✅ ${data.message}`);
+        console.log('[Sanity] Guardado exitoso:', data);
+      } else {
+        alert(`❌ Error al guardar: ${data.error}`);
+        console.error('[Sanity] Error:', data);
+      }
+    } catch (err: any) {
+      alert(`❌ Error de conexión: ${err.message}`);
+      console.error('[Sanity] Error de fetch:', err);
+    } finally {
+      setIsSavingToSanity(false);
+    }
+  }, [projectSlug, editTarget, dunahImgCoords, queleleImgCoords, drawnFeatures, isSavingToSanity]);
+
   const onUpdateDraw = useCallback((e: any) => {
     setDrawnFeatures((curr: any) => {
       const newFeatures = { ...curr };
       for (const f of e.features) {
+        if (!f.properties) f.properties = {};
+        if (!f.properties.id) {
+          // Generate a clean 4-digit ID for new lots instead of the Mapbox hash
+          f.properties.id = `LOTE-${Math.floor(1000 + Math.random() * 9000)}`;
+          f.properties.status = 'available';
+          f.properties.area = 'Consultar';
+          f.properties.price = 'Consultar';
+          f.properties.zone = 'Lote Principal';
+          f.properties.view = 'Vista panorámica';
+        }
         newFeatures[f.id] = f;
       }
       return newFeatures;
@@ -276,6 +374,25 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
                    📋 Copiar Coords Imagen
                  </button>
                )}
+
+               {/* Botón guardar en Sanity — visible siempre que se esté en modo editor */}
+               <button
+                 onClick={saveToSanity}
+                 disabled={isSavingToSanity}
+                 className="w-full mt-3 px-3 py-2.5 text-xs font-bold uppercase tracking-wider rounded transition-colors bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed border border-green-500 flex items-center justify-center gap-2"
+               >
+                 {isSavingToSanity ? (
+                   <>
+                     <svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24">
+                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                     </svg>
+                     Guardando...
+                   </>
+                 ) : (
+                   '💾 Guardar en Sanity'
+                 )}
+               </button>
             </div>
           )}
         </div>

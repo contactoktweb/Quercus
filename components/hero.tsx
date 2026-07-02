@@ -3,17 +3,37 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 
-export function Hero() {
+export function Hero({ data }: { data?: any }) {
+  // Fallbacks in case Sanity data is missing
+  const title = data?.heroTitle || 'Comunidades regenerativas en Baja California Sur'
+  const subtitle = data?.heroSubtitle || 'Un nuevo paradigma para vivir, invertir y reconectar con la naturaleza.'
+  const cta1 = data?.heroCta1Label || 'Explorar comunidades'
+  const cta2 = data?.heroCta2Label || 'Conocer la filosofía'
+  const locationBadge = data?.heroLocationBadge || 'Baja California Sur · México'
+  const bgVideo = data?.heroVideo?.asset?.url
+  const bgImage = data?.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop'
+
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Background Image with Slow Zoom */}
+      {/* Background Image or Video with Slow Zoom */}
       <div className="absolute inset-0 animate-slow-zoom">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: `url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop')`,
-          }}
-        />
+        {bgVideo ? (
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            src={bgVideo}
+          />
+        ) : (
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url('${bgImage}')`,
+            }}
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-gunmetal/40 via-gunmetal/20 to-gunmetal/60" />
       </div>
 
@@ -34,7 +54,7 @@ export function Hero() {
           />
 
           <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl xl:text-8xl text-warm-white leading-[1.1] tracking-wide text-balance">
-            Comunidades regenerativas en Baja California Sur
+            {title}
           </h1>
 
           <motion.p
@@ -43,7 +63,7 @@ export function Hero() {
             transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="mt-8 text-lg md:text-xl text-warm-white/80 max-w-2xl mx-auto leading-relaxed font-light"
           >
-            Un nuevo paradigma para vivir, invertir y reconectar con la naturaleza.
+            {subtitle}
           </motion.p>
 
           {/* CTAs */}
@@ -58,7 +78,7 @@ export function Hero() {
               className="group px-8 py-4 bg-warm-white text-gunmetal text-sm tracking-luxury uppercase transition-all duration-500 hover:bg-khaki"
             >
               <span className="flex items-center gap-3">
-                Explorar comunidades
+                {cta1}
                 <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
@@ -68,7 +88,7 @@ export function Hero() {
               href="#filosofia"
               className="px-8 py-4 border border-warm-white/50 text-warm-white text-sm tracking-luxury uppercase transition-all duration-500 hover:bg-warm-white/10"
             >
-              Conocer la filosofía
+              {cta2}
             </Link>
           </motion.div>
         </motion.div>
@@ -82,7 +102,7 @@ export function Hero() {
         >
           <div className="flex items-center gap-4 text-warm-white/60">
             <span className="w-8 h-px bg-warm-white/40" />
-            <span className="text-xs tracking-luxury uppercase">Baja California Sur · México</span>
+            <span className="text-xs tracking-luxury uppercase">{locationBadge}</span>
             <span className="w-8 h-px bg-warm-white/40" />
           </div>
         </motion.div>

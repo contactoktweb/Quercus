@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
 
-const pillars = [
+const defaultPillars = [
   {
     number: '01',
     title: 'Regeneración',
@@ -31,9 +31,18 @@ const pillars = [
   }
 ]
 
-export function Pillars() {
+export function Pillars({ data }: { data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+
+  const principles = data?.principles?.length > 0 
+    ? data.principles.slice(0, 4).map((p: any, i: number) => ({
+        number: `0${i + 1}`,
+        title: p.title,
+        description: p.desc,
+        image: defaultPillars[i]?.image || defaultPillars[0].image
+      }))
+    : defaultPillars.slice(0, 4)
 
   return (
     <section ref={ref} className="py-32 md:py-48 bg-gunmetal">
@@ -53,7 +62,7 @@ export function Pillars() {
 
         {/* Pillars Grid */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
-          {pillars.map((pillar, index) => (
+          {principles.map((pillar: any, index: number) => (
             <motion.div
               key={pillar.number}
               initial={{ opacity: 0, y: 40 }}

@@ -9,30 +9,44 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
     
-    // Credenciales temporales para pruebas (futuro Sanity)
-    if (username === 'admin' && password === 'admin123') {
-      // Dejar un rastro/token de edición en localStorage con expiración de 2 horas
-      const expirationHours = 2;
-      const expiresAt = new Date().getTime() + expirationHours * 60 * 60 * 1000;
-      
-      const sessionData = {
-        token: 'mock-editor-token-' + Math.random().toString(36).substr(2, 9),
-        expiresAt: expiresAt,
-        role: 'editor'
-      };
-      
-      localStorage.setItem('quercus_auth_session', JSON.stringify(sessionData));
-      
-      // Rastro en consola
-      console.log('✅ Sesión iniciada. Token de edición generado. Expira en 2 horas.');
-      
-      // Redirigir al inicio o a los proyectos
-      router.push('/');
-    } else {
-      setError('Credenciales incorrectas');
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        // Dejar un rastro/token de edición en localStorage con expiración de 2 horas
+        const expirationHours = 2;
+        const expiresAt = new Date().getTime() + expirationHours * 60 * 60 * 1000;
+        
+        const sessionData = {
+          token: 'editor-token-' + Math.random().toString(36).substr(2, 9),
+          expiresAt: expiresAt,
+          role: 'editor'
+        };
+        
+        localStorage.setItem('quercus_auth_session', JSON.stringify(sessionData));
+        
+        // Redirigir al inicio o a los proyectos
+        router.push('/');
+      } else {
+        setError(data.error || 'Credenciales incorrectas');
+      }
+    } catch (err: any) {
+      setError('Error de conexión. Intente nuevamente.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,9 +97,10 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full bg-gunmetal text-white py-3 rounded-lg font-bold uppercase tracking-wider hover:bg-black transition-colors shadow-md mt-4"
+            disabled={isLoading}
+            className={`w-full bg-gunmetal text-white py-3 rounded-lg font-bold uppercase tracking-wider transition-colors shadow-md mt-4 ${isLoading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-black'}`}
           >
-            Iniciar Sesión
+            {isLoading ? 'Verificando...' : 'Iniciar Sesión'}
           </button>
         </form>
       </div>

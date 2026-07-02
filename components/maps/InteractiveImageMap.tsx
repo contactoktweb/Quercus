@@ -10,12 +10,41 @@ interface InteractiveImageMapProps {
 }
 
 export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, className }: InteractiveImageMapProps) {
+  const [isSavingToSanity, setIsSavingToSanity] = useState(false);
+  
+  // Parse sanity lots
+  const parsedLots = lots.map(lot => {
+    if (lot.geoJsonFeature && typeof lot.geoJsonFeature === 'string') {
+      try {
+        const parsed = JSON.parse(lot.geoJsonFeature)
+        return {
+          ...parsed,
+          ...lot,
+          id: lot.lotId || parsed.id || lot.id,
+          coordinates: parsed.coordinates || parsed.geometry || {},
+          shape: parsed.shape || 'polygon'
+        }
+      } catch (e) { }
+    } else if (lot.geoJsonFeature && typeof lot.geoJsonFeature === 'object') {
+      return {
+        ...lot.geoJsonFeature,
+        ...lot,
+        id: lot.lotId || lot.geoJsonFeature.id || lot.id,
+        coordinates: lot.geoJsonFeature.coordinates || lot.geoJsonFeature.geometry || {},
+        shape: lot.geoJsonFeature.shape || 'polygon'
+      }
+    }
+    // Fallback if it's already in local format
+    if (!lot.coordinates) lot.coordinates = {}
+    return { ...lot, id: lot.lotId || lot.id }
+  })
+
   const [hoveredLot, setHoveredLot] = useState<any | null>(null);
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null);
   
   // Edit mode state
   const [isEditMode, setIsEditMode] = useState(false);
-  const [draftLots, setDraftLots] = useState<any[]>(lots);
+  const [draftLots, setDraftLots] = useState<any[]>(parsedLots);
   const [drawingBox, setDrawingBox] = useState<{ x: number, y: number, w: number, h: number } | null>(null);
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const [startPoint, setStartPoint] = useState<{ x: number, y: number } | null>(null);
@@ -59,7 +88,7 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
 
   useEffect(() => {
     if (!isEditMode) {
-      setDraftLots(lots);
+      setDraftLots(parsedLots);
       setSelectedEditLotId(null);
     }
   }, [lots, isEditMode]);
@@ -261,7 +290,7 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
     return { x: (minX + maxX) / 2, y: (minY + maxY) / 2 };
   };
 
-  const displayLots = isEditMode ? draftLots : lots;
+  const displayLots = isEditMode ? draftLots : parsedLots;
   const selectedEditLot = draftLots.find(l => l.id === selectedEditLotId);
 
   const getExportJSON = () => {
@@ -278,6 +307,58 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
     return output.join(',\n  ');
   };
 
+  const saveToSanity = async () => {
+    if (isSavingToSanity) return;
+    setIsSavingToSanity(true);
+    try {
+      const projectSlug = draftLots[0]?.projectSlug || 'quintaesencia';
+      const body = {
+        projectSlug,
+        lots: draftLots.map(lot => {
+          const featureObj = {
+            type: "Feature",
+            shape: lot.shape || 'circle',
+            coordinates: lot.coordinates,
+            properties: {
+              id: lot.id,
+              status: lot.status,
+              area: lot.area,
+              price: lot.price,
+              zone: lot.zone,
+              view: lot.view
+            }
+          };
+          return {
+            lotId: lot.id || `LOT-${Date.now()}`,
+            geoJsonFeature: JSON.stringify(featureObj),
+            status: lot.status || 'available',
+            area: lot.area || 'Consultar',
+            price: lot.price || 'Consultar',
+            zone: lot.zone || 'Lote Principal',
+            view: lot.view || 'Vista panorámica',
+          };
+        })
+      };
+
+      const res = await fetch('/api/sanity/save-map-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(`✅ ${data.message}`);
+      } else {
+        alert(`❌ Error al guardar: ${data.error}`);
+      }
+    } catch (err: any) {
+      alert(`❌ Error de conexión: ${err.message}`);
+    } finally {
+      setIsSavingToSanity(false);
+    }
+  };
+
   return (
     <div className={`w-full flex flex-col gap-4 ${className}`}>
       {/* Editor Controls */}
@@ -288,21 +369,34 @@ export default function InteractiveImageMap({ imageUrl, lots, onSelectLot, class
             {isEditMode ? 'Dibuja haciendo clic y arrastrando. Selecciona un lote y arrastra sus puntos.' : 'Pasa el cursor o dale clic a un lote para ver más información.'}
           </p>
         </div>
-        <button
-          onClick={() => setIsEditMode(!isEditMode)}
-          className={`px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${
-            isEditMode ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-khaki text-gunmetal hover:bg-khaki/80'
-          }`}
-        >
-          {isEditMode ? 'Salir de Edición' : 'Activar Modo Editor'}
-        </button>
+        <div className="flex gap-2">
+          {isEditMode && (
+            <button
+              onClick={saveToSanity}
+              disabled={isSavingToSanity}
+              className={`px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center gap-2 ${
+                isSavingToSanity ? 'bg-gray-500 text-white cursor-not-allowed' : 'bg-green-500 text-white hover:bg-green-600'
+              }`}
+            >
+              {isSavingToSanity ? 'Guardando...' : 'Guardar en Sanity'}
+            </button>
+          )}
+          <button
+            onClick={() => setIsEditMode(!isEditMode)}
+            className={`px-4 py-2 text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${
+              isEditMode ? 'bg-red-500 text-white hover:bg-red-600' : 'bg-khaki text-gunmetal hover:bg-khaki/80'
+            }`}
+          >
+            {isEditMode ? 'Salir de Edición' : 'Activar Modo Editor'}
+          </button>
+        </div>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4 flex-1 min-h-0">
-        <div className={`relative ${isEditMode && selectedEditLotId ? 'lg:w-3/4' : 'w-full'} h-full min-h-[400px] max-h-[800px] transition-all duration-300 rounded-2xl border border-gray-200 shadow-2xl overflow-hidden bg-[#EFEFE8]`}>
+        <div className={`relative ${isEditMode && selectedEditLotId ? 'lg:w-3/4' : 'w-full'} transition-all duration-300 rounded-2xl border border-gray-200 shadow-2xl overflow-hidden bg-[#EFEFE8] ${scale > 1 ? 'h-[750px] lg:h-[850px]' : 'h-auto'}`}>
           
           {/* Zoom Controls */}
-          <div className="absolute top-4 right-4 z-40 flex flex-col gap-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-gray-200">
+          <div className="absolute bottom-4 right-4 z-40 flex flex-col gap-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-lg shadow-md border border-gray-200">
             <button onClick={() => setScale(prev => Math.min(prev + 0.5, 5))} className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-khaki hover:text-white rounded text-gunmetal font-bold transition-colors">+</button>
             <div className="text-[10px] font-bold text-center text-gray-500">{Math.round(scale * 100)}%</div>
             <button onClick={() => setScale(prev => Math.max(prev - 0.5, 1))} className="w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-khaki hover:text-white rounded text-gunmetal font-bold transition-colors">-</button>

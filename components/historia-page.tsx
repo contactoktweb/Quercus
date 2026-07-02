@@ -8,15 +8,18 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { historyTimeline } from '@/lib/projects-data'
 
-function HeroSection() {
+function HeroSection({ data }: { data?: any }) {
+  const heroImage = data?.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop'
+  const heroLabel = data?.heroLabel || 'Nuestra trayectoria'
+  const heroTitle = data?.heroTitle || 'Nuestra Historia'
+  const heroSubtitle = data?.heroSubtitle || 'Más de dos décadas creando comunidades regenerativas en México.'
+
   return (
     <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
       {/* Background */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
-        style={{ 
-          backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop')` 
-        }}
+        style={{ backgroundImage: `url('${heroImage}')` }}
       />
       <div className="absolute inset-0 bg-gradient-to-b from-soft-black/60 via-soft-black/40 to-soft-black/80" />
       
@@ -28,7 +31,7 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="inline-block text-xs tracking-luxury uppercase text-khaki mb-6"
         >
-          Nuestra trayectoria
+          {heroLabel}
         </motion.span>
         
         <motion.h1
@@ -37,7 +40,7 @@ function HeroSection() {
           transition={{ duration: 1, delay: 0.3 }}
           className="font-serif text-4xl md:text-5xl lg:text-7xl text-warm-white leading-[1.1] mb-6"
         >
-          Nuestra Historia
+          {heroTitle}
         </motion.h1>
         
         <motion.p
@@ -46,16 +49,19 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.5 }}
           className="text-warm-white/70 text-lg md:text-xl font-light"
         >
-          Más de dos décadas creando comunidades regenerativas en México.
+          {heroSubtitle}
         </motion.p>
       </div>
     </section>
   )
 }
 
-function IntroSection() {
+function IntroSection({ data }: { data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+  
+  const title = data?.valuesTitle || 'Quercus nace de una visión profunda: crear comunidades donde la naturaleza, la arquitectura y las personas convivan en equilibrio.'
+  const subtitle = data?.valuesSubtitle || 'A lo largo de más de veinte años, esta visión ha evolucionado desde proyectos en Michoacán hasta desarrollos regenerativos en Baja California Sur. Cada comunidad representa un capítulo en nuestra historia de conexión con el territorio mexicano.'
 
   return (
     <section ref={ref} className="py-24 md:py-32 bg-warm-white">
@@ -67,11 +73,11 @@ function IntroSection() {
           className="text-center"
         >
           <p className="font-serif text-2xl md:text-3xl text-gunmetal leading-relaxed">
-            Quercus nace de una visión profunda: crear comunidades donde la naturaleza, la arquitectura y las personas convivan en equilibrio.
+            {title}
           </p>
           <div className="w-16 h-px bg-khaki mx-auto my-10" />
           <p className="text-rifle-green/70 text-base md:text-lg leading-relaxed font-light">
-            A lo largo de más de veinte años, esta visión ha evolucionado desde proyectos en Michoacán hasta desarrollos regenerativos en Baja California Sur. Cada comunidad representa un capítulo en nuestra historia de conexión con el territorio mexicano.
+            {subtitle}
           </p>
         </motion.div>
       </div>
@@ -79,9 +85,13 @@ function IntroSection() {
   )
 }
 
-function TimelineSection() {
+function TimelineSection({ data }: { data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-50px" })
+  
+  const timelineLabel = data?.timelineLabel || 'Línea del tiempo'
+  const timelineTitle = data?.timelineTitle || 'Hitos de nuestra evolución'
+  const timeline = data?.timelineItems?.length > 0 ? data.timelineItems : historyTimeline
 
   return (
     <section ref={ref} className="py-24 md:py-32 bg-gunmetal">
@@ -92,9 +102,9 @@ function TimelineSection() {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mb-20"
         >
-          <span className="text-xs tracking-luxury uppercase text-khaki">Línea del tiempo</span>
+          <span className="text-xs tracking-luxury uppercase text-khaki">{timelineLabel}</span>
           <h2 className="mt-6 font-serif text-3xl md:text-4xl lg:text-5xl text-warm-white">
-            Hitos de nuestra evolución
+            {timelineTitle}
           </h2>
         </motion.div>
 
@@ -105,7 +115,7 @@ function TimelineSection() {
 
           {/* Timeline items */}
           <div className="space-y-12 md:space-y-0">
-            {historyTimeline.map((item, index) => (
+            {timeline.map((item: any, index: number) => (
               <motion.div
                 key={item.year}
                 initial={{ opacity: 0, y: 30 }}
@@ -142,9 +152,14 @@ function TimelineSection() {
   )
 }
 
-function LegacySection() {
+function LegacySection({ data }: { data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+  
+  const image = data?.sustainabilityImage?.asset?.url || 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=987&auto=format&fit=crop'
+  const label = data?.sustainabilityLabel || 'Nuestro legado'
+  const title = data?.sustainabilityTitle || 'Un legado en evolución'
+  const text = data?.sustainabilityText || 'Cada comunidad representa una forma distinta de entender el territorio: desde el bosque y la montaña hasta el desierto, la playa y el Mar de Cortés. Nuestra historia es un testimonio de respeto por la naturaleza y compromiso con el bienestar humano.'
 
   return (
     <section ref={ref} className="py-24 md:py-32 bg-warm-white">
@@ -159,9 +174,7 @@ function LegacySection() {
           >
             <div 
               className="absolute inset-0 bg-cover bg-center"
-              style={{ 
-                backgroundImage: `url('https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=987&auto=format&fit=crop')` 
-              }}
+              style={{ backgroundImage: `url('${image}')` }}
             />
           </motion.div>
 
@@ -171,12 +184,12 @@ function LegacySection() {
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span className="text-xs tracking-luxury uppercase text-khaki">Nuestro legado</span>
+            <span className="text-xs tracking-luxury uppercase text-khaki">{label}</span>
             <h2 className="mt-6 font-serif text-3xl md:text-4xl text-gunmetal leading-[1.2] mb-6">
-              Un legado en evolución
+              {title}
             </h2>
             <p className="text-rifle-green/70 text-base leading-relaxed font-light mb-8">
-              Cada comunidad representa una forma distinta de entender el territorio: desde el bosque y la montaña hasta el desierto, la playa y el Mar de Cortés. Nuestra historia es un testimonio de respeto por la naturaleza y compromiso con el bienestar humano.
+              {text}
             </p>
             <div className="flex flex-wrap gap-6 text-center">
               <div>
@@ -242,16 +255,16 @@ function FinalCTASection() {
   )
 }
 
-export function HistoriaPage() {
+export function HistoriaPage({ data, config }: { data?: any, config?: any }) {
   return (
     <main className="overflow-x-hidden">
       <Header />
-      <HeroSection />
-      <IntroSection />
-      <TimelineSection />
-      <LegacySection />
+      <HeroSection data={data} />
+      <IntroSection data={data} />
+      <TimelineSection data={data} />
+      <LegacySection data={data} />
       <FinalCTASection />
-      <Footer />
+      <Footer config={config} />
     </main>
   )
 }
