@@ -10,7 +10,7 @@ export function Hero({ data }: { data?: any }) {
   const cta1 = data?.heroCta1Label || 'Explorar comunidades'
   const cta2 = data?.heroCta2Label || 'Conocer la filosofía'
   const locationBadge = data?.heroLocationBadge || 'Baja California Sur · México'
-  const bgVideo = data?.heroVideo?.asset?.url
+  const bgVideo = data?.heroVideo?.asset?.url || (typeof data?.heroVideo === 'string' ? data.heroVideo : undefined)
   const bgImage = data?.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop'
 
   return (
@@ -25,6 +25,7 @@ export function Hero({ data }: { data?: any }) {
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
             src={bgVideo}
+            poster={bgImage}
           />
         ) : (
           <div 

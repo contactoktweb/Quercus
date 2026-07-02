@@ -21,23 +21,25 @@ function HeroSection({ project }: { project: Project }) {
 
   return (
     <section className="relative h-screen min-h-[600px] flex items-end overflow-hidden">
-      {/* Background Video */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        src={project.heroVideo?.asset?.url || project.heroVideo}
-        autoPlay
-        muted
-        loop
-        playsInline
-        poster={project.image}
-      />
-      
       {/* Fallback Image */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{ backgroundImage: `url('${project.image}')` }}
       />
+
+      {/* Background Video */}
+      {(project.heroVideo?.asset?.url || project.heroVideo) && (
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full object-cover"
+          src={project.heroVideo?.asset?.url || project.heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster={project.image}
+        />
+      )}
       
       {/* Overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-soft-black via-soft-black/50 to-soft-black/30" />

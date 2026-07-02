@@ -32,10 +32,7 @@ function ProjectColumn({
   
   const handleMouseEnter = useCallback(() => {
     onHover()
-    if (videoRef.current && videoUrl) {
-      videoRef.current.play().catch(() => {})
-    }
-  }, [onHover, videoUrl])
+  }, [onHover])
 
   const handleMouseLeave = useCallback(() => {
     onLeave()
@@ -44,6 +41,37 @@ function ProjectColumn({
       videoRef.current.currentTime = 0
     }
   }, [onLeave, videoUrl])
+
+  // Play video as soon as element mounts and ref is populated
+  const [videoElementMounted, setVideoElementMounted] = useState(false);
+  const setVideoRef = useCallback((node: HTMLVideoElement | null) => {
+    // @ts-ignore
+    videoRef.current = node;
+    setVideoElementMounted(!!node);
+  }, []);
+
+  const playVideo = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, []);
+
+  const pauseVideo = useCallback(() => {
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, []);
+
+  const handleHoverChange = useRef(false);
+  if (isHovered !== handleHoverChange.current) {
+    handleHoverChange.current = isHovered;
+    if (isHovered) {
+      playVideo();
+    } else {
+      pauseVideo();
+    }
+  }
 
   const imageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop'
   const logoUrl = project?.logo?.asset?.url || project?.logo
@@ -82,13 +110,14 @@ function ProjectColumn({
             className="absolute inset-0"
           >
             <video
-              ref={videoRef}
+              ref={setVideoRef}
               className="absolute inset-0 w-full h-full object-cover"
               src={videoUrl}
+              autoPlay
               muted
               loop
               playsInline
-              preload="metadata"
+              preload="auto"
             />
           </motion.div>
         )}
