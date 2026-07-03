@@ -41,9 +41,7 @@ export const GLOBAL_CONFIG_QUERY = `*[_type == "globalConfig"][0]{
   phone,
   address,
   footerDescription,
-  socialLinks[]{ platform, url },
-  privacyPolicyUrl,
-  termsUrl
+  socialLinks[]{ platform, url }
 }`
 
 /** Obtiene el contenido de la página de inicio */
@@ -111,10 +109,9 @@ export const PROJECT_BY_SLUG_QUERY = `*[_type == "project" && slug.current == $s
   amenities,
   gallery[]{ asset->{url}, alt },
   renders[]{ asset->{url}, alt },
-  coordinates{ lat, lng },
   nearbyPlaces[]{ name, distance },
   hasMap,
-  mapImageOverlayCoords[]{ lng, lat }
+  masterPlanImage{ asset->{url}, alt }
 }`
 
 /** Obtiene todos los lotes de un proyecto por el ID del proyecto */

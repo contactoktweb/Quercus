@@ -9,7 +9,7 @@ import { Footer } from '@/components/footer'
 import { InteractiveMasterPlan } from '@/components/interactive-master-plan'
 import { Investment } from '@/components/investment'
 import { MasonryGallery } from '@/components/masonry-gallery'
-import { ProjectContactForm } from '@/components/project-contact-form'
+import { ContactForm } from '@/components/contact-form'
 import { Project } from '@/lib/projects-data'
 
 interface ProjectPageTemplateProps {
@@ -184,7 +184,7 @@ function AmenitiesSection({ project }: { project: Project }) {
 export function ProjectPageTemplate({ project, sanityLots = [], config }: ProjectPageTemplateProps) {
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null)
 
-  const showMasterPlan = ['dunah', 'el-quelele', 'quintaesencia'].includes(project.slug)
+  const showMasterPlan = Boolean(project.masterPlanImage || ['dunah', 'el-quelele', 'quintaesencia'].includes(project.slug))
 
   return (
     <main className="overflow-x-hidden">
@@ -211,6 +211,7 @@ export function ProjectPageTemplate({ project, sanityLots = [], config }: Projec
               projectSlug={project.slug} 
               onSelectLot={setSelectedLotId}
               sanityLots={sanityLots}
+              masterPlanImage={project.masterPlanImage?.asset?.url || project.masterPlanImage}
             />
           </div>
         </section>
@@ -249,14 +250,7 @@ export function ProjectPageTemplate({ project, sanityLots = [], config }: Projec
       )}
 
       {/* Contact Form Section */}
-      <section id="contacto" className="py-20 md:py-28 bg-warm-white">
-        <div className="max-w-[800px] mx-auto px-6 md:px-12 lg:px-20">
-          <ProjectContactForm 
-            projectName={project.name} 
-            selectedLot={selectedLotId}
-          />
-        </div>
-      </section>
+      <ContactForm />
 
       <Footer config={config} />
     </main>

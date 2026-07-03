@@ -185,17 +185,6 @@ export const project = defineType({
       of: [{ type: 'string' }],
     }),
     defineField({
-      name: 'coordinates',
-      title: 'Coordenadas Geográficas',
-      description: 'Coordenadas geográficas del proyecto para el mapa de ubicación. Latitud y Longitud.',
-      type: 'object',
-      group: 'details',
-      fields: [
-        defineField({ name: 'lat', title: 'Latitud', type: 'number' }),
-        defineField({ name: 'lng', title: 'Longitud', type: 'number' }),
-      ],
-    }),
-    defineField({
       name: 'nearbyPlaces',
       title: 'Lugares Cercanos',
       description: 'Lista de puntos de referencia cercanos con distancia aproximada (ej: La Paz - 45 min)',
@@ -215,25 +204,15 @@ export const project = defineType({
 
     // ─── MAPA ─────────────────────────────────────────────────────────────────
     defineField({
-      name: 'mapImageOverlayCoords',
-      title: 'Coordenadas de la Imagen Overlay del Mapa',
-      description: 'Array de 4 puntos [lng, lat] que definen la posición de la imagen master plan sobre el mapa satelital. Esquinas: top-left, top-right, bottom-right, bottom-left. Se actualiza automáticamente al pulsar "Guardar en Sanity" en el Modo Editor del mapa.',
-      type: 'array',
+      name: 'masterPlanImage',
+      title: 'Imagen del Master Plan',
+      description: 'Imagen principal (2D o render) del Master Plan, estilo ilustrativo interactivo.',
+      type: 'image',
       group: 'map',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            defineField({ name: 'lng', title: 'Longitud', type: 'number' }),
-            defineField({ name: 'lat', title: 'Latitud', type: 'number' }),
-          ],
-          preview: { select: { title: 'lng', subtitle: 'lat' } },
-        },
+      options: { hotspot: true },
+      fields: [
+        defineField({ name: 'alt', title: 'Texto alternativo (alt)', type: 'string' }),
       ],
-      validation: (Rule) => Rule.max(4).min(4).custom((value: any) => {
-        if (value && value.length !== 4) return 'Deben ser exactamente 4 puntos (esquinas del rectángulo)'
-        return true
-      }),
     }),
   ],
   preview: {

@@ -5,7 +5,8 @@ import { project } from './project'
 import { projectLot } from './projectLot'
 import { historiaPage } from './historiaPage'
 import { editorAuth } from './editorAuth'
+import { blog } from './blog'
 
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [globalConfig, homePage, project, projectLot, historiaPage, editorAuth],
+  types: [globalConfig, homePage, project, projectLot, historiaPage, editorAuth, blog],
 }

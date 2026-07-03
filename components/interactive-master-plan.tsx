@@ -11,6 +11,7 @@ interface InteractiveMasterPlanProps {
   projectSlug: string
   onSelectLot?: (lotId: string | null) => void
   sanityLots?: any[]
+  masterPlanImage?: string
 }
 
 const statusColors: Record<string, { bg: string; border: string; label: string }> = {
@@ -147,8 +148,16 @@ function LotDetailPanel({
   )
 }
 
-export function InteractiveMasterPlan({ projectSlug, onSelectLot, sanityLots = [] }: InteractiveMasterPlanProps) {
+export function InteractiveMasterPlan({ projectSlug, onSelectLot, sanityLots = [], masterPlanImage }: InteractiveMasterPlanProps) {
   const [selectedLot, setSelectedLot] = useState<Lot | null>(null)
+  
+  // Determinar la vista por defecto:
+  // Si tiene imagen de Master Plan, mostramos esa primero. Si no, mostramos el mapa.
+  // Si projectSlug es quintaesencia (legacy fallback) y no se pasó imagen, también mostramos imagen.
+  const hasImage = Boolean(masterPlanImage || projectSlug === 'quintaesencia')
+  const hasMap = Boolean(projectSlug === 'dunah' || projectSlug === 'el-quelele')
+  
+  const [viewMode, setViewMode] = useState<'image' | 'map'>(hasImage ? 'image' : 'map')
   const projectLots = sanityLots.length > 0 ? sanityLots : getLotsByProject(projectSlug)
 
   const handleLotClick = (lotProps: LotProperties | null) => {
@@ -189,11 +198,35 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot, sanityLots = [
 
   return (
     <div className="relative w-full">
+      {/* Toggle Buttons (Solo se muestran si existen AMBAS opciones) */}
+      {hasImage && hasMap && (
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex bg-gunmetal rounded-lg p-1 border border-silver-sand/20">
+            <button
+              onClick={() => { setViewMode('image'); setSelectedLot(null); onSelectLot?.(null); }}
+              className={`px-6 py-2 text-sm font-bold uppercase tracking-wider rounded-md transition-colors duration-300 ${
+                viewMode === 'image' ? 'bg-khaki text-gunmetal' : 'text-warm-white hover:bg-silver-sand/10'
+              }`}
+            >
+              Master Plan
+            </button>
+            <button
+              onClick={() => { setViewMode('map'); setSelectedLot(null); onSelectLot?.(null); }}
+              className={`px-6 py-2 text-sm font-bold uppercase tracking-wider rounded-md transition-colors duration-300 ${
+                viewMode === 'map' ? 'bg-khaki text-gunmetal' : 'text-warm-white hover:bg-silver-sand/10'
+              }`}
+            >
+              Ubicación en el Mapa
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Map Area */}
-      <div className={`relative w-full ${projectSlug === 'quintaesencia' ? '' : 'h-[650px] lg:h-[750px] overflow-hidden'} bg-rifle-green/5 border border-silver-sand/10 rounded-2xl shadow-2xl`}>
-        {projectSlug === 'quintaesencia' ? (
+      <div className={`relative w-full ${viewMode === 'image' ? '' : 'h-[650px] lg:h-[750px] overflow-hidden'} bg-rifle-green/5 border border-silver-sand/10 rounded-2xl shadow-2xl`}>
+        {viewMode === 'image' ? (
           <InteractiveImageMap 
-            imageUrl="/quintaesencia.png"
+            imageUrl={masterPlanImage || "/quintaesencia.png"}
             lots={projectLots}
             onSelectLot={handleLotClick}
             className="w-full h-full"
@@ -211,7 +244,7 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot, sanityLots = [
         {/* Detail Panel Overlay */}
         <AnimatePresence>
           {selectedLot && (
-            <div className={`absolute right-4 md:right-6 z-10 w-full max-w-[320px] md:max-w-[360px] ${projectSlug === 'quintaesencia' ? 'top-28 md:top-32' : 'top-4 md:top-6'}`}>
+            <div className={`absolute right-4 md:right-6 z-10 w-full max-w-[320px] md:max-w-[360px] ${viewMode === 'image' ? 'top-28 md:top-32' : 'top-4 md:top-6'}`}>
               <LotDetailPanel 
                 key={selectedLot.id}
                 lot={selectedLot} 

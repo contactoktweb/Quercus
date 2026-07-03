@@ -13,13 +13,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Buscar en Sanity si existe un usuario con esas credenciales
-    const user = await client.fetch(
-      `*[_type == "editorAuth" && username == $username && password == $password][0]`,
+    // Buscar en la configuración global de Sanity si existen esas credenciales
+    const config = await client.fetch(
+      `*[_type == "globalConfig" && editorUsername == $username && editorPassword == $password][0]`,
       { username, password }
     )
 
-    if (!user) {
+    if (!config) {
       return NextResponse.json(
         { error: 'Credenciales incorrectas' },
         { status: 401 }

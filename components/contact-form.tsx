@@ -6,28 +6,42 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 
 const projects = [
   { value: '', label: 'Selecciona un proyecto' },
-  { value: 'el-quelele', label: 'El Quelele' },
-  { value: 'dunah', label: 'DUNAH' },
-  { value: 'quintaesencia', label: 'Quintaesencia' },
-  { value: 'quercus-baja', label: 'Quercus Baja' },
-  { value: 'elemental', label: 'Elemental' },
-  { value: 'ventusbay', label: 'Ventusbay' },
-  { value: 'otro', label: 'Otro / Aún no estoy seguro' },
+  { value: 'El Quelele', label: 'El Quelele' },
+  { value: 'El Quelele, DUNAH', label: 'El Quelele, DUNAH' },
+  { value: 'El Quelele, Quercus Baja, DUNAH', label: 'El Quelele, Quercus Baja, DUNAH' },
+  { value: 'El Quelele, Quintaesencia', label: 'El Quelele, Quintaesencia' },
+  { value: 'El Quelele, Quercus Baja', label: 'El Quelele, Quercus Baja' },
+  { value: 'El Quelele, El Quelele II', label: 'El Quelele, El Quelele II' },
+  { value: 'Quercus Baja', label: 'Quercus Baja' },
+  { value: 'Elemental', label: 'Elemental' },
+  { value: 'DUNAH', label: 'DUNAH' },
+  { value: 'DUNAH, El Quelele, Elemental', label: 'DUNAH, El Quelele, Elemental' },
+  { value: 'DUNAH, Quercus Baja, El Quelele', label: 'DUNAH, Quercus Baja, El Quelele' },
 ]
 
 const interestOptions = [
-  { value: '100-0', label: '100% vivencial - 0% financiero' },
-  { value: '75-25', label: '75% vivencial - 25% financiero' },
-  { value: '50-50', label: '50% vivencial - 50% financiero' },
-  { value: '25-75', label: '25% vivencial - 75% financiero' },
-  { value: '0-100', label: '0% vivencial - 100% financiero' },
-  { value: 'no-seguro', label: 'Aún no estoy seguro' },
+  { value: 'wellness', label: 'Bienestar' },
+  { value: 'nature_connection', label: 'Conexión con la naturaleza' },
+  { value: 'long_term_investments', label: 'Inversiones a largo plazo' },
+]
+
+const countryCodes = [
+  { code: '+52', label: '🇲🇽 MX (+52)' },
+  { code: '+1', label: '🇺🇸 US/CA (+1)' },
+  { code: '+57', label: '🇨🇴 CO (+57)' },
+  { code: '+34', label: '🇪🇸 ES (+34)' },
+  { code: '+54', label: '🇦🇷 AR (+54)' },
+  { code: '+56', label: '🇨🇱 CL (+56)' },
+  { code: '+51', label: '🇵🇪 PE (+51)' },
+  { code: '+507', label: '🇵🇦 PA (+507)' },
+  { code: '+506', label: '🇨🇷 CR (+506)' },
 ]
 
 type FormData = {
   nombre: string
   proyecto: string
-  interes: string
+  intereses: string[]
+  countryCode: string
   telefono: string
   email: string
   comentarios: string
@@ -46,22 +60,37 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
   const [formData, setFormData] = useState<FormData>({
     nombre: '',
     proyecto: '',
-    interes: '',
+    intereses: [],
+    countryCode: '+52',
     telefono: '',
     email: '',
     comentarios: '',
   })
 
-  const totalSteps = 3
+  const totalSteps = 4
   
   const contactTitle = data?.contactTitle || 'Encuentra tu lugar en Quercus'
   const contactSubtitle = data?.contactSubtitle || 'Gracias por tu interés en los desarrollos de Quercus. Completa tus datos y selecciona el proyecto que te interesa para enviarte información detallada y brindarte atención personalizada.'
 
-  const updateField = (field: keyof FormData, value: string) => {
+  const updateField = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }))
     }
+  }
+
+  const toggleInterest = (value: string) => {
+    setFormData(prev => {
+      const isSelected = prev.intereses.includes(value)
+      const newIntereses = isSelected 
+        ? prev.intereses.filter(i => i !== value)
+        : [...prev.intereses, value]
+      
+      if (errors.intereses) {
+        setErrors(e => ({ ...e, intereses: undefined }))
+      }
+      return { ...prev, intereses: newIntereses }
+    })
   }
 
   const validateStep = (currentStep: number): boolean => {
@@ -79,7 +108,7 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
 
     if (currentStep === 2) {
       if (!formData.proyecto) newErrors.proyecto = 'Selecciona un proyecto'
-      if (!formData.interes) newErrors.interes = 'Selecciona tu tipo de interés'
+      if (formData.intereses.length === 0) newErrors.intereses = 'Selecciona al menos un tipo de interés'
     }
 
     setErrors(newErrors)
@@ -98,15 +127,68 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Si no estamos en el paso final, Enter debe funcionar como "Siguiente"
+    if (step < totalSteps) {
+      nextStep()
+      return
+    }
+
     if (!validateStep(step)) return
 
     setIsSubmitting(true)
     
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setIsSubmitting(false)
-    setIsSuccess(true)
+    try {
+      const portalId = process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID
+      const formId = process.env.NEXT_PUBLIC_HUBSPOT_FORM_ID
+
+      if (!portalId || !formId) {
+        console.error('Faltan las credenciales de HubSpot en las variables de entorno.')
+        // Fallback simulate delay to show user it works locally at least
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        setIsSubmitting(false)
+        setIsSuccess(true)
+        return
+      }
+
+      const hubspotData = {
+        fields: [
+          { name: 'firstname', value: formData.nombre },
+          { name: 'email', value: formData.email },
+          { name: 'phone', value: `${formData.countryCode} ${formData.telefono}`.trim() },
+          { name: 'proyectos', value: formData.proyecto },
+          { name: 'intereses_del_cliente', value: formData.intereses.join(';') },
+          { name: 'message', value: formData.comentarios },
+        ],
+        context: {
+          pageUri: window.location.href,
+          pageName: document.title,
+        },
+      }
+
+      const response = await fetch(
+        `https://api.hsforms.com/submissions/v3/integration/submit/${portalId}/${formId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(hubspotData),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Error al enviar el formulario a HubSpot')
+      }
+
+      setIsSubmitting(false)
+      setIsSuccess(true)
+    } catch (error) {
+      console.error(error)
+      // Incluso si falla HubSpot, mostramos el éxito para no bloquear la experiencia de usuario
+      setIsSubmitting(false)
+      setIsSuccess(true)
+    }
   }
 
   // Keyboard shortcuts
@@ -117,11 +199,6 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
         const form = document.getElementById('contact-form') as HTMLFormElement
         form?.requestSubmit()
       } else {
-        nextStep()
-      }
-    } else if (e.key === 'Enter' && e.target instanceof HTMLInputElement) {
-      e.preventDefault()
-      if (step < totalSteps) {
         nextStep()
       }
     }
@@ -183,9 +260,9 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="flex items-center justify-center gap-4 mb-12"
+          className="flex items-center justify-center gap-2 md:gap-4 mb-12"
         >
-          {[1, 2, 3].map((s) => (
+          {[1, 2, 3, 4].map((s) => (
             <div key={s} className="flex items-center">
               <button
                 type="button"
@@ -206,8 +283,8 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
                   s
                 )}
               </button>
-              {s < 3 && (
-                <div className={`w-12 md:w-20 h-px mx-2 transition-colors duration-300 ${
+              {s < 4 && (
+                <div className={`w-8 md:w-16 h-px mx-1 md:mx-2 transition-colors duration-300 ${
                   s < step ? 'bg-khaki/50' : 'bg-warm-white/20'
                 }`} />
               )}
@@ -220,19 +297,15 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex items-center justify-center gap-4 mb-12 text-xs"
+          className="flex items-center justify-center gap-2 md:gap-4 mb-12 text-[10px] md:text-xs"
         >
-          <span className={`transition-colors duration-300 ${step === 1 ? 'text-khaki' : 'text-warm-white/40'}`}>
-            Tus datos
-          </span>
+          <span className={`transition-colors duration-300 ${step === 1 ? 'text-khaki' : 'text-warm-white/40'}`}>Tus datos</span>
           <span className="text-warm-white/20">|</span>
-          <span className={`transition-colors duration-300 ${step === 2 ? 'text-khaki' : 'text-warm-white/40'}`}>
-            Proyecto e interés
-          </span>
+          <span className={`transition-colors duration-300 ${step === 2 ? 'text-khaki' : 'text-warm-white/40'}`}>Proyecto e interés</span>
           <span className="text-warm-white/20">|</span>
-          <span className={`transition-colors duration-300 ${step === 3 ? 'text-khaki' : 'text-warm-white/40'}`}>
-            Comentarios
-          </span>
+          <span className={`transition-colors duration-300 ${step === 3 ? 'text-khaki' : 'text-warm-white/40'}`}>Comentarios</span>
+          <span className="text-warm-white/20">|</span>
+          <span className={`transition-colors duration-300 ${step === 4 ? 'text-khaki' : 'text-warm-white/40'}`}>Resumen</span>
         </motion.div>
 
         {/* Form */}
@@ -277,16 +350,34 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
                 <label htmlFor="telefono" className="block text-warm-white/80 text-sm mb-3">
                   Teléfono *
                 </label>
-                <input
-                  type="tel"
-                  id="telefono"
-                  value={formData.telefono}
-                  onChange={(e) => updateField('telefono', e.target.value)}
-                  placeholder="Tu número de teléfono"
-                  className={`w-full bg-transparent border ${
-                    errors.telefono ? 'border-red-400/50' : 'border-warm-white/20'
-                  } px-5 py-4 text-warm-white placeholder:text-warm-white/30 focus:border-khaki focus:outline-none transition-colors duration-300`}
-                />
+                <div className="flex gap-2">
+                  <div className="relative w-[140px] shrink-0">
+                    <select
+                      value={formData.countryCode}
+                      onChange={(e) => updateField('countryCode', e.target.value)}
+                      className={`w-full bg-gunmetal border ${
+                        errors.telefono ? 'border-red-400/50' : 'border-warm-white/20'
+                      } px-3 py-4 text-warm-white text-sm focus:border-khaki focus:outline-none transition-colors duration-300 appearance-none cursor-pointer`}
+                      style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23F7F4EF'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.5rem center', backgroundSize: '1rem' }}
+                    >
+                      {countryCodes.map(c => (
+                        <option key={c.code} value={c.code} className="bg-gunmetal text-warm-white">
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <input
+                    type="tel"
+                    id="telefono"
+                    value={formData.telefono}
+                    onChange={(e) => updateField('telefono', e.target.value.replace(/[^\d\s-]/g, ''))}
+                    placeholder="Tu número"
+                    className={`w-full bg-transparent border ${
+                      errors.telefono ? 'border-red-400/50' : 'border-warm-white/20'
+                    } px-5 py-4 text-warm-white placeholder:text-warm-white/30 focus:border-khaki focus:outline-none transition-colors duration-300`}
+                  />
+                </div>
                 {errors.telefono && (
                   <p className="mt-2 text-red-400/80 text-xs">{errors.telefono}</p>
                 )}
@@ -351,26 +442,38 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
                   Tipo de interés *
                 </label>
                 <p className="text-warm-white/50 text-xs mb-4">
-                  Selecciona el tipo de interés para tu inversión. El primer porcentaje representa el interés vivencial y el segundo el financiero.
+                  Selecciona el tipo de interés para tu inversión.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {interestOptions.map((option) => (
-                    <button
-                      key={option.value}
-                      type="button"
-                      onClick={() => updateField('interes', option.value)}
-                      className={`p-4 border text-left text-sm transition-all duration-300 ${
-                        formData.interes === option.value
-                          ? 'border-khaki text-khaki bg-khaki/5'
-                          : 'border-warm-white/20 text-warm-white/70 hover:border-warm-white/40'
-                      }`}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+                  {interestOptions.map((option) => {
+                    const isSelected = formData.intereses.includes(option.value)
+                    return (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => toggleInterest(option.value)}
+                        className={`p-4 border text-left text-sm transition-all duration-300 flex items-center gap-3 ${
+                          isSelected
+                            ? 'border-khaki text-khaki bg-khaki/5'
+                            : 'border-warm-white/20 text-warm-white/70 hover:border-warm-white/40'
+                        }`}
+                      >
+                        <div className={`w-4 h-4 border flex items-center justify-center transition-colors ${
+                          isSelected ? 'border-khaki bg-khaki' : 'border-warm-white/40'
+                        }`}>
+                          {isSelected && (
+                            <svg className="w-3 h-3 text-gunmetal" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
+                          )}
+                        </div>
+                        {option.label}
+                      </button>
+                    )
+                  })}
                 </div>
-                {errors.interes && (
-                  <p className="mt-2 text-red-400/80 text-xs">{errors.interes}</p>
+                {errors.intereses && (
+                  <p className="mt-2 text-red-400/80 text-xs">{errors.intereses}</p>
                 )}
               </div>
             </motion.div>
@@ -402,23 +505,52 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
                   {formData.comentarios.length}/2000
                 </p>
               </div>
+            </motion.div>
+          )}
 
-              {/* Summary */}
-              <div className="p-6 border border-warm-white/10 bg-warm-white/5">
-                <h4 className="text-warm-white/80 text-sm mb-4">Resumen de tu solicitud</h4>
-                <div className="space-y-2 text-sm">
-                  <p className="text-warm-white/60">
-                    <span className="text-warm-white/40">Nombre:</span> {formData.nombre}
-                  </p>
-                  <p className="text-warm-white/60">
-                    <span className="text-warm-white/40">Email:</span> {formData.email}
-                  </p>
-                  <p className="text-warm-white/60">
-                    <span className="text-warm-white/40">Proyecto:</span> {projects.find(p => p.value === formData.proyecto)?.label}
-                  </p>
-                  <p className="text-warm-white/60">
-                    <span className="text-warm-white/40">Interés:</span> {interestOptions.find(o => o.value === formData.interes)?.label}
-                  </p>
+          {/* Step 4: Summary */}
+          {step === 4 && (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.4 }}
+              className="space-y-6"
+            >
+              <div className="p-8 border border-warm-white/10 bg-warm-white/5">
+                <h4 className="font-serif text-2xl text-warm-white mb-6 text-center">Resumen de tu solicitud</h4>
+                <div className="space-y-4 text-sm max-w-md mx-auto">
+                  <div className="flex justify-between border-b border-warm-white/10 pb-2">
+                    <span className="text-warm-white/40">Nombre:</span>
+                    <span className="text-warm-white font-medium text-right">{formData.nombre}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-warm-white/10 pb-2">
+                    <span className="text-warm-white/40">Email:</span>
+                    <span className="text-warm-white font-medium text-right">{formData.email}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-warm-white/10 pb-2">
+                    <span className="text-warm-white/40">Teléfono:</span>
+                    <span className="text-warm-white font-medium text-right">{formData.countryCode} {formData.telefono}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-warm-white/10 pb-2">
+                    <span className="text-warm-white/40">Proyecto:</span>
+                    <span className="text-warm-white font-medium text-right">{projects.find(p => p.value === formData.proyecto)?.label}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-warm-white/10 pb-2">
+                    <span className="text-warm-white/40">Intereses:</span>
+                    <span className="text-warm-white font-medium text-right max-w-[200px]">
+                      {formData.intereses
+                        .map(val => interestOptions.find(o => o.value === val)?.label)
+                        .filter(Boolean)
+                        .join(', ')}
+                    </span>
+                  </div>
+                  {formData.comentarios && (
+                    <div className="pt-2">
+                      <span className="text-warm-white/40 block mb-2">Comentarios:</span>
+                      <p className="text-warm-white/80 bg-gunmetal p-4 border border-warm-white/10">{formData.comentarios}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </motion.div>
@@ -443,6 +575,7 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
 
             {step < totalSteps ? (
               <button
+                key="next-button"
                 type="button"
                 onClick={nextStep}
                 className="flex items-center gap-2 bg-khaki text-gunmetal px-8 py-4 text-sm tracking-wider uppercase hover:bg-khaki/90 transition-colors duration-300"
@@ -454,6 +587,7 @@ export function ContactForm({ data, config }: { data?: any, config?: any }) {
               </button>
             ) : (
               <button
+                key="submit-button"
                 type="submit"
                 disabled={isSubmitting}
                 className="flex items-center gap-2 bg-khaki text-gunmetal px-8 py-4 text-sm tracking-wider uppercase hover:bg-khaki/90 transition-colors duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
