@@ -38,7 +38,7 @@ export default async function SostenibilidadPage() {
             {blogs.map((blog) => (
               <Link 
                 key={blog._id} 
-                href={`/sostenibilidad/${blog.slug?.current}`}
+                href={`/sostenibilidad/${blog.slug}`}
                 className="group flex flex-col h-full bg-white border border-silver-sand/20 hover:border-gunmetal/30 transition-all duration-300"
               >
                 <div className="relative aspect-[4/3] overflow-hidden bg-silver-sand/10">
