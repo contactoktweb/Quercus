@@ -145,3 +145,24 @@ export const HISTORIA_PAGE_QUERY = `*[_type == "historiaPage"][0]{
   sustainabilityText,
   sustainabilityImage{ asset->{url}, alt }
 }`
+
+/** Obtiene todos los blogs */
+export const ALL_BLOGS_QUERY = `*[_type == "blog"] | order(publishedAt desc){
+  _id,
+  title,
+  "slug": slug.current,
+  publishedAt,
+  coverImage{ asset->{url}, alt },
+  excerpt
+}`
+
+/** Obtiene un blog por su slug */
+export const BLOG_BY_SLUG_QUERY = `*[_type == "blog" && slug.current == $slug][0]{
+  _id,
+  title,
+  "slug": slug.current,
+  publishedAt,
+  coverImage{ asset->{url}, alt },
+  excerpt,
+  content
+}`

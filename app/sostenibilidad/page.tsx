@@ -1,9 +1,7 @@
 import Link from 'next/link'
-import { sanityFetch } from '@/sanity/lib/client'
-import { ALL_BLOGS_QUERY } from '@/sanity/lib/queries'
+import { sanityFetch, ALL_BLOGS_QUERY, GLOBAL_CONFIG_QUERY } from '@/sanity/lib/queries'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { getGlobalConfig } from '@/sanity/lib/client'
 import { ArrowRight } from 'lucide-react'
 
 // Forzar la regeneración si se cambia contenido en Sanity
@@ -11,7 +9,7 @@ export const revalidate = 60
 
 export default async function SostenibilidadPage() {
   const blogs = await sanityFetch<any[]>({ query: ALL_BLOGS_QUERY })
-  const config = await getGlobalConfig()
+  const config = await sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY })
 
   return (
     <main className="min-h-screen bg-warm-white">

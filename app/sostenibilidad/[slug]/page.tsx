@@ -1,9 +1,7 @@
 import { PortableText } from '@portabletext/react'
-import { sanityFetch } from '@/sanity/lib/client'
-import { BLOG_BY_SLUG_QUERY } from '@/sanity/lib/queries'
+import { sanityFetch, BLOG_BY_SLUG_QUERY, GLOBAL_CONFIG_QUERY } from '@/sanity/lib/queries'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
-import { getGlobalConfig } from '@/sanity/lib/client'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
@@ -59,7 +57,7 @@ const portableTextComponents = {
 }
 
 export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const config = await getGlobalConfig()
+  const config = await sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY })
   const post = await sanityFetch<any>({ 
     query: BLOG_BY_SLUG_QUERY, 
     params: { slug: params.slug } 
