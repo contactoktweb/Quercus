@@ -56,11 +56,12 @@ const portableTextComponents = {
   },
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const config = await sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY })
   const post = await sanityFetch<any>({ 
     query: BLOG_BY_SLUG_QUERY, 
-    params: { slug: params.slug } 
+    params: { slug } 
   })
 
   if (!post) {
