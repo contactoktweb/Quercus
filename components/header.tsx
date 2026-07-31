@@ -15,7 +15,7 @@ const navItems = [
 const bcsProjects = getProjectsByRegion('baja-california-sur')
 const michoacanProjects = getProjectsByRegion('michoacan')
 
-export function Header({ config }: { config?: any }) {
+export function Header({ config, forceDarkText = false }: { config?: any, forceDarkText?: boolean }) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false)
@@ -55,7 +55,7 @@ export function Header({ config }: { config?: any }) {
                     src={logoUrl} 
                     alt={config?.logo?.alt || "Quercus Logo"} 
                     className={`absolute inset-0 w-full h-full object-contain transition-all duration-500 ${
-                      isScrolled || isMegaMenuOpen ? 'brightness-0' : ''
+                      isScrolled || isMegaMenuOpen || forceDarkText ? 'brightness-0' : ''
                     }`} 
                   />
                 ) : (
@@ -63,12 +63,12 @@ export function Header({ config }: { config?: any }) {
                     <img 
                       src="/logos/Recurso 14.png" 
                       alt="Quercus Logo" 
-                      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${isScrolled || isMegaMenuOpen ? 'opacity-100' : 'opacity-0'}`} 
+                      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${isScrolled || isMegaMenuOpen || forceDarkText ? 'opacity-0' : 'opacity-100'}`} 
                     />
                     <img 
                       src="/logos/Recurso 9 (1).png" 
                       alt="Quercus Logo" 
-                      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${isScrolled || isMegaMenuOpen ? 'opacity-0' : 'opacity-100'}`} 
+                      className={`absolute inset-0 w-full h-full object-contain transition-opacity duration-500 ${isScrolled || isMegaMenuOpen || forceDarkText ? 'opacity-100' : 'opacity-0'}`} 
                     />
                   </>
                 )}
@@ -88,7 +88,7 @@ export function Header({ config }: { config?: any }) {
                   {item.hasMegaMenu ? (
                     <button
                       className={`flex items-center gap-1 text-sm tracking-luxury uppercase transition-all duration-300 hover:opacity-60 ${
-                        isScrolled || isMegaMenuOpen ? 'text-gunmetal' : 'text-warm-white'
+                        isScrolled || isMegaMenuOpen || forceDarkText ? 'text-gunmetal' : 'text-warm-white'
                       }`}
                     >
                       {item.name}
@@ -105,7 +105,7 @@ export function Header({ config }: { config?: any }) {
                     <Link
                       href={item.href}
                       className={`text-sm tracking-luxury uppercase transition-all duration-300 hover:opacity-60 ${
-                        isScrolled || isMegaMenuOpen ? 'text-gunmetal' : 'text-warm-white'
+                        isScrolled || isMegaMenuOpen || forceDarkText ? 'text-gunmetal' : 'text-warm-white'
                       }`}
                     >
                       {item.name}
@@ -120,7 +120,7 @@ export function Header({ config }: { config?: any }) {
               <Link
                 href="/#contacto"
                 className={`text-sm tracking-wider-luxury uppercase px-6 py-3 border transition-all duration-300 hover:bg-gunmetal hover:text-warm-white ${
-                  isScrolled || isMegaMenuOpen
+                  isScrolled || isMegaMenuOpen || forceDarkText
                     ? 'border-gunmetal text-gunmetal' 
                     : 'border-warm-white/50 text-warm-white hover:border-warm-white'
                 }`}
@@ -133,7 +133,7 @@ export function Header({ config }: { config?: any }) {
             <button
               onClick={() => setIsMobileMenuOpen(true)}
               className={`lg:hidden p-2 transition-colors duration-300 ${
-                isScrolled ? 'text-gunmetal' : 'text-warm-white'
+                isScrolled || forceDarkText ? 'text-gunmetal' : 'text-warm-white'
               }`}
               aria-label="Abrir menú"
             >

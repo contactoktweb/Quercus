@@ -10,6 +10,7 @@ import { LotTooltip } from './LotTooltip';
 import { dunahKmlGeoJson } from './dunahKml';
 import { queleleKmlGeoJson } from './queleleKml';
 import { quintaesenciaKmlGeoJson } from './quintaesenciaKml';
+import { quercusKmlGeoJson } from './quercusKml';
 import DrawControl from './DrawControl';
 
 export interface LotsMapProps {
@@ -375,9 +376,9 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
       
       <Map
         initialViewState={{
-          longitude: projectSlug === 'el-quelele' ? -110.5185 : projectSlug === 'quintaesencia' ? -110.517 : -110.7059,
-          latitude: projectSlug === 'el-quelele' ? 24.1975 : projectSlug === 'quintaesencia' ? 24.179 : 23.8060,
-          zoom: projectSlug === 'el-quelele' ? 16 : projectSlug === 'quintaesencia' ? 14 : 14,
+          longitude: projectSlug === 'el-quelele' ? -110.5185 : projectSlug === 'quintaesencia' ? -110.517 : projectSlug === 'quercus-baja' ? -110.015 : -110.7059,
+          latitude: projectSlug === 'el-quelele' ? 24.1975 : projectSlug === 'quintaesencia' ? 24.179 : projectSlug === 'quercus-baja' ? 24.103 : 23.8060,
+          zoom: projectSlug === 'el-quelele' ? 16 : projectSlug === 'quintaesencia' ? 14 : projectSlug === 'quercus-baja' ? 14.5 : 14,
           pitch: 0, // Vista 2D
           bearing: 0 // Vista norte arriba
         }}
@@ -496,6 +497,28 @@ export default function LotsMap({ onSelectLot, className, hideSidebar = false, p
             />
             <Layer
               id="quintaesencia-kml-fill"
+              type="fill"
+              paint={{
+                'fill-color': '#22c55e',
+                'fill-opacity': 0.1
+              }}
+            />
+          </Source>
+        )}
+
+        {projectSlug === 'quercus-baja' && (
+          <Source id="quercus-kml-source" type="geojson" data={quercusKmlGeoJson as any}>
+            <Layer
+              id="quercus-kml-line"
+              type="line"
+              paint={{
+                'line-color': '#22c55e',
+                'line-width': 2,
+                'line-dasharray': [2, 2]
+              }}
+            />
+            <Layer
+              id="quercus-kml-fill"
               type="fill"
               paint={{
                 'fill-color': '#22c55e',

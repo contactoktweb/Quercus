@@ -155,7 +155,7 @@ export function InteractiveMasterPlan({ projectSlug, onSelectLot, sanityLots = [
   // Si tiene imagen de Master Plan, mostramos esa primero. Si no, mostramos el mapa.
   // Si projectSlug es quintaesencia (legacy fallback) y no se pasó imagen, también mostramos imagen.
   const hasImage = Boolean(masterPlanImage || projectSlug === 'quintaesencia')
-  const hasMap = Boolean(projectSlug === 'dunah' || projectSlug === 'el-quelele')
+  const hasMap = Boolean(projectSlug === 'dunah' || projectSlug === 'el-quelele' || projectSlug === 'quercus-baja')
   
   const [viewMode, setViewMode] = useState<'image' | 'map'>(hasImage ? 'image' : 'map')
   const projectLots = sanityLots.length > 0 ? sanityLots : getLotsByProject(projectSlug)

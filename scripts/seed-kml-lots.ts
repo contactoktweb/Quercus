@@ -38,7 +38,8 @@ const client = createClient({
 const kmlFiles = [
   { slug: 'dunah', file: 'doc.kml' },
   { slug: 'el-quelele', file: 'quelele.kml' },
-  { slug: 'quintaesencia', file: 'quintaesencia.kml' }
+  { slug: 'quintaesencia', file: 'quintaesencia.kml' },
+  { slug: 'quercus-baja', file: 'quercus.kml' }
 ]
 
 async function seedKmlLots() {

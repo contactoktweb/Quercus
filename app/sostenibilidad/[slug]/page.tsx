@@ -70,7 +70,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <main className="min-h-screen bg-warm-white">
-      <Header config={config} />
+      <Header config={config} forceDarkText={true} />
       
       <article className="pt-32 pb-24 md:pt-40 md:pb-32 px-6 md:px-12 lg:px-20 max-w-[1800px] mx-auto">
         <div className="max-w-3xl mx-auto">

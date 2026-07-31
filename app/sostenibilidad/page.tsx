@@ -13,7 +13,7 @@ export default async function SostenibilidadPage() {
 
   return (
     <main className="min-h-screen bg-warm-white">
-      <Header config={config} />
+      <Header config={config} forceDarkText={true} />
       
       {/* Hero Section */}
       <section className="pt-32 pb-16 md:pt-48 md:pb-24 px-6 md:px-12 lg:px-20 max-w-[1800px] mx-auto">

@@ -6,17 +6,17 @@ import { useRef, useState, useEffect, useCallback } from 'react'
 
 const projects = [
   { value: '', label: 'Selecciona un proyecto' },
-  { value: 'El Quelele', label: 'El Quelele' },
-  { value: 'El Quelele, DUNAH', label: 'El Quelele, DUNAH' },
-  { value: 'El Quelele, Quercus Baja, DUNAH', label: 'El Quelele, Quercus Baja, DUNAH' },
-  { value: 'El Quelele, Quintaesencia', label: 'El Quelele, Quintaesencia' },
-  { value: 'El Quelele, Quercus Baja', label: 'El Quelele, Quercus Baja' },
-  { value: 'El Quelele, El Quelele II', label: 'El Quelele, El Quelele II' },
-  { value: 'Quercus Baja', label: 'Quercus Baja' },
-  { value: 'Elemental', label: 'Elemental' },
   { value: 'DUNAH', label: 'DUNAH' },
-  { value: 'DUNAH, El Quelele, Elemental', label: 'DUNAH, El Quelele, Elemental' },
-  { value: 'DUNAH, Quercus Baja, El Quelele', label: 'DUNAH, Quercus Baja, El Quelele' },
+  { value: 'El Quelele', label: 'El Quelele' },
+  { value: 'El Quelele II', label: 'El Quelele II' },
+  { value: 'Elemental', label: 'Elemental' },
+  { value: 'Explora', label: 'Explora' },
+  { value: 'Mil Cumbres', label: 'Mil Cumbres' },
+  { value: 'Quercus Baja', label: 'Quercus Baja' },
+  { value: 'Quercus I', label: 'Quercus I' },
+  { value: 'Quercus II', label: 'Quercus II' },
+  { value: 'Quintaesencia', label: 'Quintaesencia' },
+  { value: 'Ventusbay', label: 'Ventusbay' },
 ]
 
 const interestOptions = [
