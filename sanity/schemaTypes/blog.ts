@@ -61,7 +61,24 @@ export const blog = defineType({
       type: 'array',
       of: [
         { type: 'block' },
-        { type: 'image' }
+        { 
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Texto Alternativo',
+              description: 'Importante para accesibilidad y SEO.',
+            },
+            {
+              name: 'width',
+              type: 'string',
+              title: 'Ancho de la imagen',
+              description: 'Ejemplo: 100%, 500px, 50vw. Si se deja en blanco, usará 100%.',
+            },
+          ]
+        }
       ],
       validation: (Rule) => Rule.required(),
     }),

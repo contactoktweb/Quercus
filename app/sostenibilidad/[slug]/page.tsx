@@ -15,14 +15,17 @@ const portableTextComponents = {
       if (!value?.asset?._ref) {
         return null
       }
-      // Construir la URL temporalmente, idealmente usaríamos el builder de urlFor de Sanity
+      
+      const width = value.width || '100%'
+      
       return (
-        <div className="my-10">
+        <div className="my-10 flex flex-col items-center">
           <img
             alt={value.alt || 'Imagen del artículo'}
             loading="lazy"
             src={`https://cdn.sanity.io/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'}/${value.asset._ref.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`}
-            className="w-full h-auto object-cover rounded-sm"
+            className="h-auto object-cover rounded-sm"
+            style={{ width, maxWidth: '100%' }}
           />
           {value.alt && <p className="text-sm text-center mt-2 text-silver-sand/70">{value.alt}</p>}
         </div>
@@ -42,9 +45,13 @@ const portableTextComponents = {
   },
   marks: {
     link: ({ children, value }: any) => {
-      const rel = !value.href.startsWith('/') ? 'noreferrer noopener' : undefined
+      const href = value?.href || '#'
+      const isExternal = !href.startsWith('/') && !href.startsWith('#')
+      const rel = isExternal ? 'noreferrer noopener' : undefined
+      const target = isExternal ? '_blank' : undefined
+      
       return (
-        <a href={value.href} rel={rel} className="text-khaki hover:underline decoration-1 underline-offset-4 transition-all">
+        <a href={href} rel={rel} target={target} className="text-khaki hover:underline decoration-1 underline-offset-4 transition-all">
           {children}
         </a>
       )

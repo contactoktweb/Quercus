@@ -37,4 +37,8 @@ export const structure = (S: StructureBuilder) =>
         .title('🗺️ Lotes de Proyectos')
         .schemaType('projectLot')
         .child(S.documentTypeList('projectLot').title('Lotes')),
+      S.listItem()
+        .title('📝 Blog / Sostenibilidad')
+        .schemaType('blog')
+        .child(S.documentTypeList('blog').title('Artículos')),
     ])
