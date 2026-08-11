@@ -14,6 +14,7 @@ export const historiaPage = defineType({
     { name: 'timeline', title: '📅 Timeline de Hitos' },
     { name: 'values', title: '💎 Sección de Valores' },
     { name: 'sustainability', title: '🌱 Sección Sostenibilidad' },
+    { name: 'finalCta', title: '🚀 Llamado a la Acción (Final)' },
   ],
   fields: [
     // ─── HERO ────────────────────────────────────────────────────────────────
@@ -166,6 +167,47 @@ export const historiaPage = defineType({
       type: 'image',
       options: { hotspot: true },
       group: 'sustainability',
+      fields: [
+        defineField({ name: 'alt', title: 'Alt', type: 'string' }),
+      ],
+    }),
+
+    // ─── FINAL CTA ───────────────────────────────────────────────────────────
+    defineField({
+      name: 'finalCtaTitle',
+      title: 'Título del CTA Final (H2)',
+      description: 'ej: "El futuro de Quercus apenas comienza"',
+      type: 'string',
+      group: 'finalCta',
+    }),
+    defineField({
+      name: 'finalCtaSubtitle',
+      title: 'Subtítulo del CTA Final',
+      description: 'Párrafo bajo el título',
+      type: 'text',
+      rows: 3,
+      group: 'finalCta',
+    }),
+    defineField({
+      name: 'finalCtaButtonText',
+      title: 'Texto del Botón',
+      description: 'ej: "Explorar comunidades"',
+      type: 'string',
+      group: 'finalCta',
+    }),
+    defineField({
+      name: 'finalCtaButtonLink',
+      title: 'Enlace del Botón',
+      description: 'ej: "/#proyectos"',
+      type: 'string',
+      group: 'finalCta',
+    }),
+    defineField({
+      name: 'finalCtaImage',
+      title: 'Imagen de Fondo',
+      type: 'image',
+      options: { hotspot: true },
+      group: 'finalCta',
       fields: [
         defineField({ name: 'alt', title: 'Alt', type: 'string' }),
       ],

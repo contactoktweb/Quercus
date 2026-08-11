@@ -212,9 +212,15 @@ function LegacySection({ data }: { data?: any }) {
   )
 }
 
-function FinalCTASection() {
+function FinalCTASection({ data }: { data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
+
+  const title = data?.finalCtaTitle || 'El futuro de Quercus apenas comienza'
+  const subtitle = data?.finalCtaSubtitle || 'Descubre las comunidades que hoy continúan esta visión de desarrollo regenerativo y bienestar.'
+  const buttonText = data?.finalCtaButtonText || 'Explorar comunidades'
+  const buttonLink = data?.finalCtaButtonLink || '/#proyectos'
+  const bgImage = data?.finalCtaImage?.asset?.url || 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop'
 
   return (
     <section ref={ref} className="relative py-32 md:py-48 overflow-hidden">
@@ -222,7 +228,7 @@ function FinalCTASection() {
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{ 
-          backgroundImage: `url('https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop')` 
+          backgroundImage: `url('${bgImage}')` 
         }}
       />
       <div className="absolute inset-0 bg-gradient-to-t from-soft-black/90 via-soft-black/70 to-soft-black/50" />
@@ -235,16 +241,16 @@ function FinalCTASection() {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         >
           <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-warm-white leading-[1.2] mb-6">
-            El futuro de Quercus apenas comienza
+            {title}
           </h2>
           <p className="text-warm-white/70 text-base md:text-lg font-light mb-10 max-w-[600px] mx-auto">
-            Descubre las comunidades que hoy continúan esta visión de desarrollo regenerativo y bienestar.
+            {subtitle}
           </p>
           <Link
-            href="/#proyectos"
+            href={buttonLink}
             className="inline-flex items-center gap-3 bg-warm-white text-gunmetal text-sm tracking-luxury uppercase px-8 py-4 hover:bg-khaki transition-colors duration-300"
           >
-            Explorar comunidades
+            {buttonText}
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -263,7 +269,7 @@ export function HistoriaPage({ data, config }: { data?: any, config?: any }) {
       <IntroSection data={data} />
       <TimelineSection data={data} />
       <LegacySection data={data} />
-      <FinalCTASection />
+      <FinalCTASection data={data} />
       <Footer config={config} />
     </main>
   )

@@ -134,9 +134,24 @@ export const homePage = defineType({
       group: 'editorial',
     }),
     defineField({
+      name: 'philosophyLabel',
+      title: 'Label de Filosofía (Pillars)',
+      description: 'Texto pequeño en mayúsculas (ej: "Nuestra filosofía")',
+      type: 'string',
+      group: 'editorial',
+    }),
+    defineField({
+      name: 'philosophyTitle',
+      title: 'Título de Filosofía (Pillars)',
+      description: 'Título principal de la sección de pilares (ej: "Un estilo de vida guiado por la naturaleza")',
+      type: 'text',
+      rows: 2,
+      group: 'editorial',
+    }),
+    defineField({
       name: 'principles',
-      title: 'Lista de Principios',
-      description: 'Los principios de diseño que aparecen en la sección editorial',
+      title: 'Lista de Principios (Pillars)',
+      description: 'Los principios de diseño que aparecen en la sección editorial / filosofía',
       type: 'array',
       group: 'editorial',
       of: [
@@ -145,6 +160,13 @@ export const homePage = defineType({
           fields: [
             defineField({ name: 'title', title: 'Título del Principio', type: 'string', description: 'ej: "Baja densidad"' }),
             defineField({ name: 'desc', title: 'Descripción', type: 'string', description: 'Una frase breve que explica el principio' }),
+            defineField({
+              name: 'image',
+              title: 'Imagen del Principio',
+              type: 'image',
+              options: { hotspot: true },
+              fields: [defineField({ name: 'alt', title: 'Alt', type: 'string' })],
+            }),
           ],
           preview: { select: { title: 'title', subtitle: 'desc' } },
         },

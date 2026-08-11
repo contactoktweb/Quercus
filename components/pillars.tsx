@@ -40,7 +40,7 @@ export function Pillars({ data }: { data?: any }) {
         number: `0${i + 1}`,
         title: p.title,
         description: p.desc,
-        image: defaultPillars[i]?.image || defaultPillars[0].image
+        image: p.image?.asset?.url || defaultPillars[i]?.image || defaultPillars[0].image
       }))
     : defaultPillars.slice(0, 4)
 
@@ -54,10 +54,17 @@ export function Pillars({ data }: { data?: any }) {
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           className="text-center mb-24"
         >
-          <span className="text-xs tracking-luxury uppercase text-khaki">Nuestra filosofía</span>
-          <h2 className="mt-6 font-serif text-4xl md:text-5xl lg:text-6xl text-warm-white leading-[1.2]">
-            Un estilo de vida guiado<br />por la naturaleza
-          </h2>
+          <span className="text-xs tracking-luxury uppercase text-khaki">
+            {data?.philosophyLabel || 'Nuestra filosofía'}
+          </span>
+          <h2 
+            className="mt-6 font-serif text-4xl md:text-5xl lg:text-6xl text-warm-white leading-[1.2]"
+            dangerouslySetInnerHTML={{ 
+              __html: data?.philosophyTitle 
+                ? data.philosophyTitle.replace(/\n/g, '<br />') 
+                : 'Un estilo de vida guiado<br />por la naturaleza'
+            }}
+          />
         </motion.div>
 
         {/* Pillars Grid */}
