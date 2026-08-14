@@ -59,7 +59,9 @@ export const HOME_PAGE_QUERY = `*[_type == "homePage"][0]{
   editorialSectionLabel,
   editorialSectionTitle,
   editorialSectionText,
-  principles[]{ title, desc },
+  philosophyLabel,
+  philosophyTitle,
+  principles[]{ title, desc, image{ asset->{url}, alt } },
   stats[]{ number, label },
   testimonials[]{ quote, author, role, avatar{ asset->{url}, alt } },
   contactTitle,
@@ -143,7 +145,12 @@ export const HISTORIA_PAGE_QUERY = `*[_type == "historiaPage"][0]{
   sustainabilityLabel,
   sustainabilityTitle,
   sustainabilityText,
-  sustainabilityImage{ asset->{url}, alt }
+  sustainabilityImage{ asset->{url}, alt },
+  finalCtaTitle,
+  finalCtaSubtitle,
+  finalCtaButtonText,
+  finalCtaButtonLink,
+  finalCtaImage{ asset->{url}, alt }
 }`
 
 /** Obtiene todos los blogs */

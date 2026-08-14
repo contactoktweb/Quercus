@@ -1,6 +1,8 @@
 import { HistoriaPage } from '@/components/historia-page'
 import { sanityFetch, HISTORIA_PAGE_QUERY, GLOBAL_CONFIG_QUERY } from '@/sanity/lib/queries'
 
+export const revalidate = 60
+
 export const metadata = {
   title: 'Nuestra Historia | Quercus',
   description: 'Más de dos décadas creando comunidades regenerativas en México. Conoce la trayectoria de Quercus desde Michoacán hasta Baja California Sur.',

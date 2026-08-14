@@ -13,6 +13,8 @@ import { Footer } from '@/components/footer'
 
 import { sanityFetch, HOME_PAGE_QUERY, GLOBAL_CONFIG_QUERY, ALL_PROJECTS_QUERY } from '@/sanity/lib/queries'
 
+export const revalidate = 60
+
 export default async function Home() {
   const [homeData, configData, projectsData] = await Promise.all([
     sanityFetch<any>({ query: HOME_PAGE_QUERY }),
