@@ -7,9 +7,11 @@ import Link from 'next/link'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { historyTimeline } from '@/lib/projects-data'
+import { optimizeSanityUrl } from '@/sanity/lib/image'
 
 function HeroSection({ data }: { data?: any }) {
-  const heroImage = data?.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop'
+  const rawHeroImage = data?.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop'
+  const heroImage = optimizeSanityUrl(rawHeroImage, { width: 1920, quality: 85 })
   const heroLabel = data?.heroLabel || 'Nuestra trayectoria'
   const heroTitle = data?.heroTitle || 'Nuestra Historia'
   const heroSubtitle = data?.heroSubtitle || 'Más de dos décadas creando comunidades regenerativas en México.'
@@ -156,7 +158,8 @@ function LegacySection({ data }: { data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   
-  const image = data?.sustainabilityImage?.asset?.url || 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=987&auto=format&fit=crop'
+  const rawImage = data?.sustainabilityImage?.asset?.url || 'https://images.unsplash.com/photo-1518495973542-4542c06a5843?q=80&w=987&auto=format&fit=crop'
+  const image = optimizeSanityUrl(rawImage, { width: 1000, quality: 85 })
   const label = data?.sustainabilityLabel || 'Nuestro legado'
   const title = data?.sustainabilityTitle || 'Un legado en evolución'
   const text = data?.sustainabilityText || 'Cada comunidad representa una forma distinta de entender el territorio: desde el bosque y la montaña hasta el desierto, la playa y el Mar de Cortés. Nuestra historia es un testimonio de respeto por la naturaleza y compromiso con el bienestar humano.'
@@ -220,7 +223,8 @@ function FinalCTASection({ data }: { data?: any }) {
   const subtitle = data?.finalCtaSubtitle || 'Descubre las comunidades que hoy continúan esta visión de desarrollo regenerativo y bienestar.'
   const buttonText = data?.finalCtaButtonText || 'Explorar comunidades'
   const buttonLink = data?.finalCtaButtonLink || '/#proyectos'
-  const bgImage = data?.finalCtaImage?.asset?.url || 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop'
+  const rawBgImage = data?.finalCtaImage?.asset?.url || 'https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?q=80&w=2070&auto=format&fit=crop'
+  const bgImage = optimizeSanityUrl(rawBgImage, { width: 1920, quality: 85 })
 
   return (
     <section ref={ref} className="relative py-32 md:py-48 overflow-hidden">

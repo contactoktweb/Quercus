@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { sanityFetch, ALL_BLOGS_QUERY, GLOBAL_CONFIG_QUERY } from '@/sanity/lib/queries'
+import { sanityFetch, ALL_BLOGS_QUERY, GLOBAL_CONFIG_QUERY, optimizeSanityUrl } from '@/sanity/lib/queries'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { ArrowRight } from 'lucide-react'
@@ -35,26 +35,28 @@ export default async function SostenibilidadPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-12">
-            {blogs.map((blog) => (
-              <Link 
-                key={blog._id} 
-                href={`/sostenibilidad/${blog.slug}`}
-                className="group flex flex-col h-full bg-white border border-silver-sand/20 hover:border-gunmetal/30 transition-all duration-300"
-              >
-                <div className="relative aspect-[4/3] overflow-hidden bg-silver-sand/10">
-                  {blog.coverImage?.asset?.url ? (
-                    <img 
-                      src={blog.coverImage.asset.url} 
-                      alt={blog.coverImage.alt || blog.title}
-                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-silver-sand/50">
-                      Sin imagen
-                    </div>
-                  )}
-                </div>
-                <div className="p-6 md:p-8 flex flex-col flex-grow">
+            {blogs.map((blog) => {
+              const coverUrl = optimizeSanityUrl(blog.coverImage, { width: 800, quality: 85 })
+              return (
+                <Link 
+                  key={blog._id} 
+                  href={`/sostenibilidad/${blog.slug}`}
+                  className="group flex flex-col h-full bg-white border border-silver-sand/20 hover:border-gunmetal/30 transition-all duration-300"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden bg-silver-sand/10">
+                    {coverUrl ? (
+                      <img 
+                        src={coverUrl} 
+                        alt={blog.coverImage?.alt || blog.title}
+                        className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-silver-sand/50">
+                        Sin imagen
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6 md:p-8 flex flex-col flex-grow">
                   <div className="text-xs tracking-luxury uppercase text-khaki mb-4">
                     {new Date(blog.publishedAt).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
                   </div>
@@ -70,7 +72,8 @@ export default async function SostenibilidadPage() {
                   </div>
                 </div>
               </Link>
-            ))}
+            )
+          })}
           </div>
         )}
       </section>

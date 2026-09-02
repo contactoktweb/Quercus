@@ -5,6 +5,7 @@ import { useInView } from 'framer-motion'
 import { useRef, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { projectsData as defaultProjectsData } from '@/lib/projects-data'
+import { optimizeSanityUrl } from '@/sanity/lib/image'
 
 type Region = 'baja-california-sur' | 'michoacan'
 
@@ -73,8 +74,10 @@ function ProjectColumn({
     }
   }
 
-  const imageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop'
-  const logoUrl = project?.logo?.asset?.url || project?.logo
+  const rawImageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop'
+  const imageUrl = optimizeSanityUrl(rawImageUrl, { width: 1400, quality: 85 })
+  const rawLogoUrl = project?.logo?.asset?.url || project?.logo
+  const logoUrl = optimizeSanityUrl(rawLogoUrl)
 
   return (
     <motion.div
@@ -227,8 +230,10 @@ function MobileProjectCard({ project, index }: { project: any, index: number }) 
   }
 
   const videoUrl = project?.video?.asset?.url || project?.video || project?.heroVideo?.asset?.url || project?.heroVideo
-  const imageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop'
-  const logoUrl = project?.logo?.asset?.url || project?.logo
+  const rawImageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2053&auto=format&fit=crop'
+  const imageUrl = optimizeSanityUrl(rawImageUrl, { width: 800, quality: 85 })
+  const rawLogoUrl = project?.logo?.asset?.url || project?.logo
+  const logoUrl = optimizeSanityUrl(rawLogoUrl)
 
   return (
     <motion.div

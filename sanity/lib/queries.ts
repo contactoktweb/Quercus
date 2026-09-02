@@ -1,15 +1,5 @@
 import { client } from './client'
-import imageUrlBuilder from '@sanity/image-url'
-
-const builder = imageUrlBuilder(client)
-
-/**
- * Genera la URL de una imagen de Sanity.
- * Uso: urlFor(image).width(800).url()
- */
-export function urlFor(source: any) {
-  return builder.image(source)
-}
+export { urlFor, optimizeSanityUrl, type ImageOptimizationOptions } from './image'
 
 /**
  * Función de fetch desde Sanity con revalidación para ISR.

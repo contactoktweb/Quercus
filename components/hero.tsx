@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { optimizeSanityUrl } from '@/sanity/lib/image'
 
 export function Hero({ data }: { data?: any }) {
   // Fallbacks in case Sanity data is missing
@@ -11,7 +12,8 @@ export function Hero({ data }: { data?: any }) {
   const cta2 = data?.heroCta2Label || 'Conocer la filosofía'
   const locationBadge = data?.heroLocationBadge || 'Baja California Sur · México'
   const bgVideo = data?.heroVideo?.asset?.url || (typeof data?.heroVideo === 'string' ? data.heroVideo : undefined)
-  const bgImage = data?.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop'
+  const rawBgImage = data?.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop'
+  const bgImage = optimizeSanityUrl(rawBgImage, { quality: 85 })
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
@@ -23,6 +25,7 @@ export function Hero({ data }: { data?: any }) {
             loop
             muted
             playsInline
+            preload="auto"
             className="absolute inset-0 w-full h-full object-cover"
             src={bgVideo}
             poster={bgImage}

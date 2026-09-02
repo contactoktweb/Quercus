@@ -31,16 +31,17 @@ function HeroSection({ project }: { project: Project }) {
 
       {/* Background Video */}
       {(project.heroVideo?.asset?.url || project.heroVideo) && (
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full object-cover"
-          src={project.heroVideo?.asset?.url || project.heroVideo}
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={project.image}
-        />
+          <video
+            ref={videoRef}
+            className="absolute inset-0 w-full h-full object-cover"
+            src={project.heroVideo?.asset?.url || project.heroVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster={project.image}
+          />
       )}
       
       {/* Overlay */}

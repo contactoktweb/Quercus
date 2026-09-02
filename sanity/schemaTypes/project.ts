@@ -112,17 +112,17 @@ export const project = defineType({
     defineField({
       name: 'video',
       title: 'Video de Presentación',
-      description: 'Sube un archivo de video (.mp4). Aparece en la galería del proyecto y al hacer hover.',
+      description: 'Sube un archivo de video (.webm o .mp4). Aparece en la galería del proyecto y al hacer hover.',
       type: 'file',
-      options: { accept: 'video/mp4,video/quicktime' },
+      options: { accept: 'video/mp4,video/webm,video/quicktime' },
       group: 'media',
     }),
     defineField({
       name: 'heroVideo',
       title: 'Video del Hero',
-      description: 'Sube un archivo de video (.mp4) que se reproduce como fondo del hero del proyecto.',
+      description: 'Sube un archivo de video (.webm o .mp4) que se reproduce como fondo del hero del proyecto.',
       type: 'file',
-      options: { accept: 'video/mp4,video/quicktime' },
+      options: { accept: 'video/mp4,video/webm,video/quicktime' },
       group: 'media',
     }),
     defineField({

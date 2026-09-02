@@ -1,5 +1,5 @@
 import { PortableText } from '@portabletext/react'
-import { sanityFetch, BLOG_BY_SLUG_QUERY, GLOBAL_CONFIG_QUERY } from '@/sanity/lib/queries'
+import { sanityFetch, BLOG_BY_SLUG_QUERY, GLOBAL_CONFIG_QUERY, urlFor, optimizeSanityUrl } from '@/sanity/lib/queries'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { notFound } from 'next/navigation'
@@ -12,18 +12,21 @@ export const revalidate = 60
 const portableTextComponents = {
   types: {
     image: ({ value }: any) => {
-      if (!value?.asset?._ref) {
+      if (!value?.asset?._ref && !value?.asset?.url) {
         return null
       }
       
       const width = value.width || '100%'
+      const imageUrl = value.asset?._ref 
+        ? urlFor(value).auto('format').quality(85).url() 
+        : optimizeSanityUrl(value.asset?.url, { quality: 85 })
       
       return (
         <div className="my-10 flex flex-col items-center">
           <img
             alt={value.alt || 'Imagen del artículo'}
             loading="lazy"
-            src={`https://cdn.sanity.io/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET || 'production'}/${value.asset._ref.replace('image-', '').replace('-jpg', '.jpg').replace('-png', '.png').replace('-webp', '.webp')}`}
+            src={imageUrl}
             className="h-auto object-cover rounded-sm"
             style={{ width, maxWidth: '100%' }}
           />
@@ -101,10 +104,10 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
 
         {/* Cover Image */}
-        {post.coverImage?.asset?.url && (
+        {(post.coverImage?.asset?.url || post.coverImage?.asset?._ref) && (
           <div className="w-full max-w-5xl mx-auto aspect-[16/9] md:aspect-[21/9] bg-silver-sand/10 mb-12 md:mb-20 overflow-hidden">
             <img 
-              src={post.coverImage.asset.url} 
+              src={optimizeSanityUrl(post.coverImage, { width: 1600, quality: 85 })} 
               alt={post.coverImage.alt || post.title}
               className="w-full h-full object-cover"
             />

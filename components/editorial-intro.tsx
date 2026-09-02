@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
+import { optimizeSanityUrl } from '@/sanity/lib/image'
 
 const defaultPrinciples = [
   { title: 'Baja densidad', desc: 'Espacios amplios que respetan el entorno natural' },
@@ -25,7 +26,8 @@ export function EditorialIntro({ data }: { data?: any }) {
 
   const headline = data?.editorialHeadline || 'Quercus desarrolla comunidades de baja densidad donde la naturaleza, el bienestar y la inversión patrimonial conviven en equilibrio.'
   const paragraph = data?.editorialParagraph || 'Durante más de dos décadas, hemos creado entornos regenerativos diseñados para quienes buscan vivir con propósito, invertir con visión y formar parte de una comunidad consciente.'
-  const image = data?.editorialImage?.asset?.url || 'https://images.unsplash.com/photo-1510797215324-95aa89f43c33?q=80&w=2070&auto=format&fit=crop'
+  const rawImage = data?.editorialImage?.asset?.url || 'https://images.unsplash.com/photo-1510797215324-95aa89f43c33?q=80&w=2070&auto=format&fit=crop'
+  const image = optimizeSanityUrl(rawImage, { width: 1200, quality: 85 })
   const sectionLabel = data?.editorialSectionLabel || 'Regeneración'
   const sectionTitle = data?.editorialSectionTitle || 'Diseñar con respeto por el territorio'
   const sectionText = data?.editorialSectionText || 'Cada comunidad se concibe desde una relación consciente con el paisaje, promoviendo baja densidad, integración arquitectónica, respeto por la vegetación endémica y una forma de habitar más responsable.'

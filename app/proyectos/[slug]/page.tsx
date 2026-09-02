@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { ProjectPageTemplate } from '@/components/project-page-template'
 import { projectsData, getProjectBySlug } from '@/lib/projects-data'
-import { sanityFetch, PROJECT_BY_SLUG_QUERY, ALL_PROJECTS_QUERY, GLOBAL_CONFIG_QUERY } from '@/sanity/lib/queries'
+import { sanityFetch, PROJECT_BY_SLUG_QUERY, ALL_PROJECTS_QUERY, GLOBAL_CONFIG_QUERY, optimizeSanityUrl } from '@/sanity/lib/queries'
 
 export async function generateStaticParams() {
   try {
@@ -28,13 +28,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     return { title: 'Proyecto no encontrado | Quercus' }
   }
 
+  const ogImage = optimizeSanityUrl(project.image, { width: 1200, height: 630, quality: 85 })
+
   return {
     title: `${project.name} | Quercus`,
     description: project.description,
     openGraph: {
       title: `${project.name} - ${project.tagline}`,
       description: project.description,
-      images: [project.image?.asset?.url || project.image],
+      images: [ogImage || project.image],
     },
   }
 }
@@ -44,12 +46,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   
   let project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug } })
   
-  // Format Sanity data to match local structure if needed
+  // Format and optimize Sanity data
   if (project) {
-    if (project.image?.asset?.url) project.image = project.image.asset.url
-    if (project.logo?.asset?.url) project.logo = project.logo.asset.url
-    if (project.gallery) project.gallery = project.gallery.map((img: any) => img.asset?.url || img)
-    if (project.renders) project.renders = project.renders.map((img: any) => img.asset?.url || img)
+    if (project.image) project.image = optimizeSanityUrl(project.image, { width: 1920, quality: 85 })
+    if (project.logo) project.logo = optimizeSanityUrl(project.logo)
+    if (project.gallery) project.gallery = project.gallery.map((img: any) => optimizeSanityUrl(img, { width: 1600, quality: 85 }))
+    if (project.renders) project.renders = project.renders.map((img: any) => optimizeSanityUrl(img, { width: 1600, quality: 85 }))
+    if (project.masterPlanImage) project.masterPlanImage = optimizeSanityUrl(project.masterPlanImage, { width: 2000, quality: 90 })
   } else {
     // Fallback
     project = getProjectBySlug(slug)

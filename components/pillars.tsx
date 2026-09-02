@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion'
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
+import { optimizeSanityUrl } from '@/sanity/lib/image'
 
 const defaultPillars = [
   {
@@ -40,9 +41,12 @@ export function Pillars({ data }: { data?: any }) {
         number: `0${i + 1}`,
         title: p.title,
         description: p.desc,
-        image: p.image?.asset?.url || defaultPillars[i]?.image || defaultPillars[0].image
+        image: optimizeSanityUrl(p.image?.asset?.url || defaultPillars[i]?.image || defaultPillars[0].image, { width: 800, quality: 85 })
       }))
-    : defaultPillars.slice(0, 4)
+    : defaultPillars.slice(0, 4).map((p) => ({
+        ...p,
+        image: optimizeSanityUrl(p.image, { width: 800, quality: 85 })
+      }))
 
   return (
     <section ref={ref} className="py-32 md:py-48 bg-gunmetal">

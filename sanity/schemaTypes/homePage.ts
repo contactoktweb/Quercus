@@ -56,10 +56,10 @@ export const homePage = defineType({
     defineField({
       name: 'heroVideo',
       title: 'Video de Fondo del Hero',
-      description: 'Video de fondo (.mp4) que ocupará toda la pantalla. Si se provee, tendrá prioridad sobre la imagen.',
+      description: 'Video de fondo (.webm o .mp4) que ocupará toda la pantalla. Si se provee, tendrá prioridad sobre la imagen.',
       type: 'file',
       group: 'hero',
-      options: { accept: 'video/mp4' },
+      options: { accept: 'video/mp4,video/webm,video/quicktime' },
     }),
     defineField({
       name: 'heroCta1Label',

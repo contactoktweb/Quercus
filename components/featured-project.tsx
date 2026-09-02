@@ -5,6 +5,7 @@ import { useInView } from 'framer-motion'
 import { useRef } from 'react'
 import Link from 'next/link'
 import { projectsData } from '@/lib/projects-data'
+import { optimizeSanityUrl } from '@/sanity/lib/image'
 
 const defaultHighlights = [
   { label: '1.4 km', desc: 'de playa prístina' },
@@ -23,7 +24,8 @@ export function FeaturedProject({ projects, data }: { projects?: any[], data?: a
 
   if (!project) return null
 
-  const imageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop'
+  const rawImageUrl = project?.image?.asset?.url || project?.image || 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop'
+  const imageUrl = optimizeSanityUrl(rawImageUrl, { width: 1920, quality: 85 })
   const highlights = project?.stats || defaultHighlights
 
   return (

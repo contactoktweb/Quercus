@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { getProjectsByRegion } from '@/lib/projects-data'
+import { optimizeSanityUrl } from '@/sanity/lib/image'
 
 const navItems = [
   { name: 'Inicio', href: '/' },
@@ -21,7 +22,7 @@ export function Header({ config, forceDarkText = false }: { config?: any, forceD
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false)
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false)
 
-  const logoUrl = config?.logo?.asset?.url
+  const logoUrl = optimizeSanityUrl(config?.logo)
 
   useEffect(() => {
     const handleScroll = () => {
