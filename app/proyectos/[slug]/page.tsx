@@ -21,6 +21,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   
   let project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug } })
   if (!project) {
+    if (slug === 'quercus-mil-cumbres' || slug === 'mil-cumbres') {
+      project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug: 'querucs-mil-cumbres' } })
+    } else if (slug === 'querucs-mil-cumbres') {
+      project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug: 'mil-cumbres' } })
+    } else if (slug === 'quercus-baja') {
+      project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug: 'quercus-origen' } })
+    }
+  }
+  if (!project) {
     project = getProjectBySlug(slug)
   }
   
@@ -45,6 +54,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params
   
   let project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug } })
+  if (!project) {
+    if (slug === 'quercus-mil-cumbres' || slug === 'mil-cumbres') {
+      project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug: 'querucs-mil-cumbres' } })
+    } else if (slug === 'querucs-mil-cumbres') {
+      project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug: 'mil-cumbres' } })
+    } else if (slug === 'quercus-baja') {
+      project = await sanityFetch<any>({ query: PROJECT_BY_SLUG_QUERY, params: { slug: 'quercus-origen' } })
+    }
+  }
   
   // Format and optimize Sanity data
   if (project) {
@@ -62,24 +80,27 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     notFound()
   }
 
-  // Fetch lots & config
+  // Fetch lots, config & all projects for header
   let sanityLots: any[] = []
   let configData: any = null
-  if (project._id) {
-    const { LOTS_BY_PROJECT_QUERY } = await import('@/sanity/lib/queries')
-    const [lots, config] = await Promise.all([
-      sanityFetch<any[]>({ query: LOTS_BY_PROJECT_QUERY, params: { projectId: project._id } }),
-      sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY })
-    ])
-    sanityLots = lots
-    configData = config
-  }
+  let allProjectsList: any[] = []
+  
+  const { LOTS_BY_PROJECT_QUERY } = await import('@/sanity/lib/queries')
+  const [lots, config, allProjects] = await Promise.all([
+    project._id ? sanityFetch<any[]>({ query: LOTS_BY_PROJECT_QUERY, params: { projectId: project._id } }) : Promise.resolve([]),
+    sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY }),
+    sanityFetch<any[]>({ query: ALL_PROJECTS_QUERY }),
+  ])
+  sanityLots = lots || []
+  configData = config
+  allProjectsList = allProjects || []
 
   return (
     <ProjectPageTemplate 
       project={project} 
       sanityLots={sanityLots}
       config={configData}
+      projects={allProjectsList}
     />
   )
 }

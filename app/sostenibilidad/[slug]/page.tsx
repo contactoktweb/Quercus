@@ -68,11 +68,11 @@ const portableTextComponents = {
 
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const config = await sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY })
-  const post = await sanityFetch<any>({ 
-    query: BLOG_BY_SLUG_QUERY, 
-    params: { slug } 
-  })
+  const [config, post, projects] = await Promise.all([
+    sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY }),
+    sanityFetch<any>({ query: BLOG_BY_SLUG_QUERY, params: { slug } }),
+    sanityFetch<any[]>({ query: ALL_PROJECTS_QUERY }),
+  ])
 
   if (!post) {
     notFound()
@@ -80,7 +80,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
 
   return (
     <main className="min-h-screen bg-warm-white">
-      <Header config={config} forceDarkText={true} />
+      <Header config={config} forceDarkText={true} projects={projects} />
       
       <article className="pt-32 pb-24 md:pt-40 md:pb-32 px-6 md:px-12 lg:px-20 max-w-[1800px] mx-auto">
         <div className="max-w-3xl mx-auto">

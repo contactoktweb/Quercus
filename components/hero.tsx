@@ -1,15 +1,12 @@
 "use client"
 
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import { optimizeSanityUrl } from '@/sanity/lib/image'
 
 export function Hero({ data }: { data?: any }) {
   // Fallbacks in case Sanity data is missing
   const title = data?.heroTitle || 'Comunidades regenerativas en Baja California Sur'
   const subtitle = data?.heroSubtitle || 'Un nuevo paradigma para vivir, invertir y reconectar con la naturaleza.'
-  const cta1 = data?.heroCta1Label || 'Explorar comunidades'
-  const cta2 = data?.heroCta2Label || 'Conocer la filosofía'
   const locationBadge = data?.heroLocationBadge || 'Baja California Sur · México'
   const bgVideo = data?.heroVideo?.asset?.url || (typeof data?.heroVideo === 'string' ? data.heroVideo : undefined)
   const rawBgImage = data?.heroImage?.asset?.url || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop'
@@ -69,32 +66,6 @@ export function Hero({ data }: { data?: any }) {
           >
             {subtitle}
           </motion.p>
-
-          {/* CTAs */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6"
-          >
-            <Link
-              href="#comunidades"
-              className="group px-8 py-4 bg-warm-white text-gunmetal text-sm tracking-luxury uppercase transition-all duration-500 hover:bg-khaki"
-            >
-              <span className="flex items-center gap-3">
-                {cta1}
-                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </span>
-            </Link>
-            <Link
-              href="#filosofia"
-              className="px-8 py-4 border border-warm-white/50 text-warm-white text-sm tracking-luxury uppercase transition-all duration-500 hover:bg-warm-white/10"
-            >
-              {cta2}
-            </Link>
-          </motion.div>
         </motion.div>
 
         {/* Bottom Location */}

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { sanityFetch, ALL_BLOGS_QUERY, GLOBAL_CONFIG_QUERY, optimizeSanityUrl } from '@/sanity/lib/queries'
+import { sanityFetch, ALL_BLOGS_QUERY, GLOBAL_CONFIG_QUERY, ALL_PROJECTS_QUERY, optimizeSanityUrl } from '@/sanity/lib/queries'
 import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { ArrowRight } from 'lucide-react'
@@ -8,12 +8,15 @@ import { ArrowRight } from 'lucide-react'
 export const revalidate = 60 
 
 export default async function SostenibilidadPage() {
-  const blogs = await sanityFetch<any[]>({ query: ALL_BLOGS_QUERY })
-  const config = await sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY })
+  const [blogs, config, projects] = await Promise.all([
+    sanityFetch<any[]>({ query: ALL_BLOGS_QUERY }),
+    sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY }),
+    sanityFetch<any[]>({ query: ALL_PROJECTS_QUERY }),
+  ])
 
   return (
     <main className="min-h-screen bg-warm-white">
-      <Header config={config} forceDarkText={true} />
+      <Header config={config} forceDarkText={true} projects={projects} />
       
       {/* Hero Section */}
       <section className="pt-32 pb-16 md:pt-48 md:pb-24 px-6 md:px-12 lg:px-20 max-w-[1800px] mx-auto">

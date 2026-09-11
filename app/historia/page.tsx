@@ -1,5 +1,5 @@
 import { HistoriaPage } from '@/components/historia-page'
-import { sanityFetch, HISTORIA_PAGE_QUERY, GLOBAL_CONFIG_QUERY } from '@/sanity/lib/queries'
+import { sanityFetch, HISTORIA_PAGE_QUERY, GLOBAL_CONFIG_QUERY, ALL_PROJECTS_QUERY } from '@/sanity/lib/queries'
 
 export const revalidate = 60
 
@@ -9,10 +9,11 @@ export const metadata = {
 }
 
 export default async function Historia() {
-  const [data, config] = await Promise.all([
+  const [data, config, projects] = await Promise.all([
     sanityFetch<any>({ query: HISTORIA_PAGE_QUERY }),
     sanityFetch<any>({ query: GLOBAL_CONFIG_QUERY }),
+    sanityFetch<any[]>({ query: ALL_PROJECTS_QUERY }),
   ])
   
-  return <HistoriaPage data={data} config={config} />
+  return <HistoriaPage data={data} config={config} projects={projects} />
 }

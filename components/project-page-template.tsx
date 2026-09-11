@@ -16,6 +16,7 @@ interface ProjectPageTemplateProps {
   project: Project
   sanityLots?: any[]
   config?: any
+  projects?: any[]
 }
 
 function HeroSection({ project }: { project: Project }) {
@@ -182,14 +183,14 @@ function AmenitiesSection({ project }: { project: Project }) {
 }
 
 
-export function ProjectPageTemplate({ project, sanityLots = [], config }: ProjectPageTemplateProps) {
+export function ProjectPageTemplate({ project, sanityLots = [], config, projects = [] }: ProjectPageTemplateProps) {
   const [selectedLotId, setSelectedLotId] = useState<string | null>(null)
 
   const showMasterPlan = Boolean(project.masterPlanImage || ['dunah', 'el-quelele', 'quintaesencia'].includes(project.slug))
 
   return (
     <main className="overflow-x-hidden">
-      <Header config={config} />
+      <Header config={config} projects={projects} />
       <HeroSection project={project} />
       <StatsSection project={project} />
       

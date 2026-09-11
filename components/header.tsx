@@ -1,28 +1,54 @@
 "use client"
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
-import { getProjectsByRegion } from '@/lib/projects-data'
+import { projectsData } from '@/lib/projects-data'
 import { optimizeSanityUrl } from '@/sanity/lib/image'
+import { client } from '@/sanity/lib/client'
+import { ALL_PROJECTS_QUERY } from '@/sanity/lib/queries'
 
 const navItems = [
   { name: 'Inicio', href: '/' },
-  { name: 'Comunidades', href: '#', hasMegaMenu: true },
+  { name: 'Comunidades', href: '/#proyectos', hasMegaMenu: true },
   { name: 'Historia', href: '/historia' },
   { name: 'Sostenibilidad', href: '/sostenibilidad' },
 ]
 
-const bcsProjects = getProjectsByRegion('baja-california-sur')
-const michoacanProjects = getProjectsByRegion('michoacan')
+export interface HeaderProps {
+  config?: any
+  forceDarkText?: boolean
+  projects?: any[]
+}
 
-export function Header({ config, forceDarkText = false }: { config?: any, forceDarkText?: boolean }) {
+export function Header({ config, forceDarkText = false, projects: initialProjects }: HeaderProps) {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false)
   const [mobileSubmenuOpen, setMobileSubmenuOpen] = useState(false)
+  const [projects, setProjects] = useState<any[]>(initialProjects || [])
+  const closeTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const logoUrl = optimizeSanityUrl(config?.logo)
+
+  // Sync projects from initialProjects or client-side fetch from Sanity
+  useEffect(() => {
+    if (initialProjects && initialProjects.length > 0) {
+      setProjects(initialProjects)
+      return
+    }
+
+    client
+      .fetch<any[]>(ALL_PROJECTS_QUERY)
+      .then((data) => {
+        if (data && data.length > 0) {
+          setProjects(data)
+        }
+      })
+      .catch((err) => {
+        console.warn('Error al cargar proyectos de Sanity en el Header:', err)
+      })
+  }, [initialProjects])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,7 +58,53 @@ export function Header({ config, forceDarkText = false }: { config?: any, forceD
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const closeMegaMenu = () => setIsMegaMenuOpen(false)
+  // Cleanup hover timer on unmount
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current)
+    }
+  }, [])
+
+  const handleMouseEnter = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+    setIsMegaMenuOpen(true)
+  }
+
+  const handleMouseLeave = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+    }
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsMegaMenuOpen(false)
+    }, 200)
+  }
+
+  const closeMegaMenu = () => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current)
+      closeTimeoutRef.current = null
+    }
+    setIsMegaMenuOpen(false)
+  }
+
+  // Active projects from Sanity or static fallback
+  const activeProjects = projects.length > 0 ? projects : projectsData
+
+  const bcsProjects = activeProjects.filter((p: any) =>
+    p.region === 'baja-california-sur' ||
+    (p.location && p.location.toLowerCase().includes('baja'))
+  )
+  const michoacanProjects = activeProjects.filter((p: any) =>
+    p.region === 'michoacan' ||
+    (p.location && p.location.toLowerCase().includes('michoac'))
+  )
+  const otherProjects = activeProjects.filter((p: any) =>
+    !bcsProjects.some((b: any) => b.slug === p.slug) &&
+    !michoacanProjects.some((m: any) => m.slug === p.slug)
+  )
 
   return (
     <>
@@ -83,12 +155,16 @@ export function Header({ config, forceDarkText = false }: { config?: any, forceD
                 <div 
                   key={item.name}
                   className="relative"
-                  onMouseEnter={() => item.hasMegaMenu && setIsMegaMenuOpen(true)}
-                  onMouseLeave={() => item.hasMegaMenu && setIsMegaMenuOpen(false)}
+                  onMouseEnter={() => item.hasMegaMenu && handleMouseEnter()}
+                  onMouseLeave={() => item.hasMegaMenu && handleMouseLeave()}
                 >
                   {item.hasMegaMenu ? (
                     <button
-                      className={`flex items-center gap-1 text-sm tracking-luxury uppercase transition-all duration-300 hover:opacity-60 ${
+                      type="button"
+                      onClick={() => setIsMegaMenuOpen((prev) => !prev)}
+                      aria-expanded={isMegaMenuOpen}
+                      aria-haspopup="true"
+                      className={`flex items-center gap-1 text-sm tracking-luxury uppercase transition-all duration-300 hover:opacity-60 cursor-pointer ${
                         isScrolled || isMegaMenuOpen || forceDarkText ? 'text-gunmetal' : 'text-warm-white'
                       }`}
                     >
@@ -155,54 +231,88 @@ export function Header({ config, forceDarkText = false }: { config?: any, forceD
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="absolute top-full left-0 right-0 bg-warm-white border-b border-silver-sand/30 shadow-lg"
-              onMouseEnter={() => setIsMegaMenuOpen(true)}
-              onMouseLeave={() => setIsMegaMenuOpen(false)}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
             >
               <div className="max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 py-12">
-                <div className="grid md:grid-cols-2 gap-12">
+                <div className={`grid gap-12 ${otherProjects.length > 0 ? 'md:grid-cols-3' : 'md:grid-cols-2'}`}>
                   {/* Baja California Sur */}
-                  <div>
-                    <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6">
-                      Baja California Sur
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {bcsProjects.map((project) => (
-                        <Link
-                          key={project.slug}
-                          href={`/proyectos/${project.slug}`}
-                          onClick={closeMegaMenu}
-                          className="group p-4 hover:bg-silver-sand/10 transition-colors duration-300"
-                        >
-                          <span className="block font-serif text-lg text-gunmetal group-hover:text-khaki transition-colors duration-300">
-                            {project.name}
-                          </span>
-                          <span className="text-xs text-rifle-green/50">{project.tagline}</span>
-                        </Link>
-                      ))}
+                  {bcsProjects.length > 0 && (
+                    <div>
+                      <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6 font-semibold">
+                        Baja California Sur
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {bcsProjects.map((project: any) => (
+                          <Link
+                            key={project.slug}
+                            href={`/proyectos/${project.slug}`}
+                            onClick={closeMegaMenu}
+                            className="group p-4 hover:bg-silver-sand/10 transition-colors duration-300 rounded-sm block"
+                          >
+                            <span className="block font-serif text-lg text-gunmetal group-hover:text-khaki transition-colors duration-300">
+                              {project.name}
+                            </span>
+                            <span className="text-xs text-rifle-green/60 line-clamp-1 mt-0.5">
+                              {project.tagline || project.location || ''}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Michoacán */}
-                  <div>
-                    <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6">
-                      Michoacán
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {michoacanProjects.map((project) => (
-                        <Link
-                          key={project.slug}
-                          href={`/proyectos/${project.slug}`}
-                          onClick={closeMegaMenu}
-                          className="group p-4 hover:bg-silver-sand/10 transition-colors duration-300"
-                        >
-                          <span className="block font-serif text-lg text-gunmetal group-hover:text-khaki transition-colors duration-300">
-                            {project.name}
-                          </span>
-                          <span className="text-xs text-rifle-green/50">{project.tagline}</span>
-                        </Link>
-                      ))}
+                  {michoacanProjects.length > 0 && (
+                    <div>
+                      <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6 font-semibold">
+                        Michoacán
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {michoacanProjects.map((project: any) => (
+                          <Link
+                            key={project.slug}
+                            href={`/proyectos/${project.slug}`}
+                            onClick={closeMegaMenu}
+                            className="group p-4 hover:bg-silver-sand/10 transition-colors duration-300 rounded-sm block"
+                          >
+                            <span className="block font-serif text-lg text-gunmetal group-hover:text-khaki transition-colors duration-300">
+                              {project.name}
+                            </span>
+                            <span className="text-xs text-rifle-green/60 line-clamp-1 mt-0.5">
+                              {project.tagline || project.location || ''}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {/* Other regions if any */}
+                  {otherProjects.length > 0 && (
+                    <div>
+                      <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6 font-semibold">
+                        Otras Comunidades
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {otherProjects.map((project: any) => (
+                          <Link
+                            key={project.slug}
+                            href={`/proyectos/${project.slug}`}
+                            onClick={closeMegaMenu}
+                            className="group p-4 hover:bg-silver-sand/10 transition-colors duration-300 rounded-sm block"
+                          >
+                            <span className="block font-serif text-lg text-gunmetal group-hover:text-khaki transition-colors duration-300">
+                              {project.name}
+                            </span>
+                            <span className="text-xs text-rifle-green/60 line-clamp-1 mt-0.5">
+                              {project.tagline || project.location || ''}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* All communities link */}
@@ -210,10 +320,10 @@ export function Header({ config, forceDarkText = false }: { config?: any, forceD
                   <Link
                     href="/#proyectos"
                     onClick={closeMegaMenu}
-                    className="inline-flex items-center gap-2 text-sm tracking-luxury uppercase text-gunmetal hover:text-khaki transition-colors duration-300"
+                    className="inline-flex items-center gap-2 text-sm tracking-luxury uppercase text-gunmetal hover:text-khaki transition-colors duration-300 group"
                   >
                     Ver todas las comunidades
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
                   </Link>
@@ -284,40 +394,74 @@ export function Header({ config, forceDarkText = false }: { config?: any, forceD
                             >
                               <div className="pb-6 space-y-6">
                                 {/* BCS */}
-                                <div>
-                                  <h4 className="text-xs tracking-luxury uppercase text-khaki mb-4">
-                                    Baja California Sur
-                                  </h4>
-                                  <div className="grid grid-cols-2 gap-3">
-                                    {bcsProjects.map((project) => (
-                                      <Link
-                                        key={project.slug}
-                                        href={`/proyectos/${project.slug}`}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="text-warm-white/70 hover:text-khaki transition-colors duration-300"
-                                      >
-                                        {project.name}
-                                      </Link>
-                                    ))}
+                                {bcsProjects.length > 0 && (
+                                  <div>
+                                    <h4 className="text-xs tracking-luxury uppercase text-khaki mb-4 font-semibold">
+                                      Baja California Sur
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      {bcsProjects.map((project: any) => (
+                                        <Link
+                                          key={project.slug}
+                                          href={`/proyectos/${project.slug}`}
+                                          onClick={() => setIsMobileMenuOpen(false)}
+                                          className="text-warm-white/70 hover:text-khaki transition-colors duration-300 py-1"
+                                        >
+                                          {project.name}
+                                        </Link>
+                                      ))}
+                                    </div>
                                   </div>
-                                </div>
+                                )}
                                 {/* Michoacán */}
-                                <div>
-                                  <h4 className="text-xs tracking-luxury uppercase text-khaki mb-4">
-                                    Michoacán
-                                  </h4>
-                                  <div className="grid grid-cols-2 gap-3">
-                                    {michoacanProjects.map((project) => (
-                                      <Link
-                                        key={project.slug}
-                                        href={`/proyectos/${project.slug}`}
-                                        onClick={() => setIsMobileMenuOpen(false)}
-                                        className="text-warm-white/70 hover:text-khaki transition-colors duration-300"
-                                      >
-                                        {project.name}
-                                      </Link>
-                                    ))}
+                                {michoacanProjects.length > 0 && (
+                                  <div>
+                                    <h4 className="text-xs tracking-luxury uppercase text-khaki mb-4 font-semibold">
+                                      Michoacán
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      {michoacanProjects.map((project: any) => (
+                                        <Link
+                                          key={project.slug}
+                                          href={`/proyectos/${project.slug}`}
+                                          onClick={() => setIsMobileMenuOpen(false)}
+                                          className="text-warm-white/70 hover:text-khaki transition-colors duration-300 py-1"
+                                        >
+                                          {project.name}
+                                        </Link>
+                                      ))}
+                                    </div>
                                   </div>
+                                )}
+                                {/* Other regions if any */}
+                                {otherProjects.length > 0 && (
+                                  <div>
+                                    <h4 className="text-xs tracking-luxury uppercase text-khaki mb-4 font-semibold">
+                                      Otras Comunidades
+                                    </h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                      {otherProjects.map((project: any) => (
+                                        <Link
+                                          key={project.slug}
+                                          href={`/proyectos/${project.slug}`}
+                                          onClick={() => setIsMobileMenuOpen(false)}
+                                          className="text-warm-white/70 hover:text-khaki transition-colors duration-300 py-1"
+                                        >
+                                          {project.name}
+                                        </Link>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                                {/* Ver todas las comunidades */}
+                                <div className="pt-2">
+                                  <Link
+                                    href="/#proyectos"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="inline-flex items-center gap-2 text-xs tracking-luxury uppercase text-khaki hover:text-warm-white transition-colors duration-300"
+                                  >
+                                    Ver todas las comunidades →
+                                  </Link>
                                 </div>
                               </div>
                             </motion.div>

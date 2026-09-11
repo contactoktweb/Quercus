@@ -322,23 +322,23 @@ export function InteractiveProjects({ projects }: { projects?: any[] }) {
   const filteredProjects = safeProjects.filter((p: any) => p.region === activeRegion)
 
   return (
-    <section ref={ref} className="bg-soft-black" id="proyectos">
+    <section ref={ref} className="bg-warm-white" id="proyectos">
       {/* Header */}
       <div className="max-w-[1800px] mx-auto px-6 md:px-12 lg:px-20 py-20 md:py-28">
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col md:flex-row md:items-end md:justify-between"
+          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6"
         >
           <div>
-            <span className="text-xs tracking-luxury uppercase text-khaki">Portfolio</span>
-            <h2 className="mt-6 font-serif text-4xl md:text-5xl lg:text-6xl text-warm-white leading-[1.2]">
+            <span className="text-xs tracking-luxury uppercase text-khaki font-medium">Portfolio</span>
+            <h2 className="mt-6 font-serif text-4xl md:text-5xl lg:text-6xl text-gunmetal leading-[1.2]">
               Nuestras comunidades
             </h2>
           </div>
-          <div className="mt-6 md:mt-0 flex flex-col items-start md:items-end gap-4">
-            <p className="text-warm-white/60 max-w-md text-sm leading-relaxed md:text-right">
+          <div className="mt-6 md:mt-0 flex flex-col items-start md:items-end">
+            <p className="text-rifle-green/75 max-w-xl lg:max-w-none text-sm leading-relaxed md:text-right lg:whitespace-nowrap">
               Cada proyecto nace del paisaje, la cultura local y una visión de largo plazo.
             </p>
           </div>
@@ -349,7 +349,7 @@ export function InteractiveProjects({ projects }: { projects?: any[] }) {
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="flex gap-1 mt-12 bg-soft-black/50 border border-silver-sand/10 p-1.5 w-fit"
+          className="flex gap-1.5 mt-12 bg-silver-sand/15 border border-silver-sand/30 p-1.5 w-fit"
         >
           {(Object.keys(regionLabels) as Region[]).map((region) => (
             <button
@@ -360,8 +360,8 @@ export function InteractiveProjects({ projects }: { projects?: any[] }) {
               }}
               className={`text-xs tracking-luxury uppercase px-6 py-3 transition-all duration-300 ${
                 activeRegion === region
-                  ? 'bg-khaki/20 text-khaki'
-                  : 'text-warm-white/50 hover:text-warm-white'
+                  ? 'bg-gunmetal text-warm-white shadow-sm'
+                  : 'text-gunmetal/60 hover:text-gunmetal hover:bg-silver-sand/20'
               }`}
             >
               {regionLabels[region]}

@@ -265,10 +265,10 @@ function FinalCTASection({ data }: { data?: any }) {
   )
 }
 
-export function HistoriaPage({ data, config }: { data?: any, config?: any }) {
+export function HistoriaPage({ data, config, projects }: { data?: any, config?: any, projects?: any[] }) {
   return (
     <main className="overflow-x-hidden">
-      <Header config={config} />
+      <Header config={config} projects={projects} />
       <HeroSection data={data} />
       <IntroSection data={data} />
       <TimelineSection data={data} />
