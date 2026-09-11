@@ -11,6 +11,7 @@ export const project = defineType({
   type: 'document',
   groups: [
     { name: 'info', title: '📋 Información General' },
+    { name: 'about', title: '🌿 Acerca del Proyecto' },
     { name: 'media', title: '🖼️ Media (Imágenes y Video)' },
     { name: 'details', title: '📍 Detalles y Amenidades' },
     { name: 'map', title: '🗺️ Configuración del Mapa' },
@@ -63,10 +64,10 @@ export const project = defineType({
     }),
     defineField({
       name: 'description',
-      title: 'Descripción',
-      description: 'Descripción completa del proyecto. Aparece en el hero y en la sección de texto del proyecto.',
+      title: 'Descripción (Hero / Resumen)',
+      description: 'Descripción breve o introducción del proyecto. Aparece en el hero principal del proyecto y en las tarjetas.',
       type: 'text',
-      rows: 5,
+      rows: 4,
       group: 'info',
     }),
     defineField({
@@ -83,6 +84,31 @@ export const project = defineType({
         ],
         layout: 'radio',
       },
+    }),
+
+    // ─── ACERCA DEL PROYECTO ──────────────────────────────────────────────────
+    defineField({
+      name: 'aboutLabel',
+      title: 'Etiqueta Superior',
+      description: 'Texto pequeño sobre el título (por defecto: "Acerca del proyecto")',
+      type: 'string',
+      group: ['about', 'info'],
+      initialValue: 'Acerca del proyecto',
+    }),
+    defineField({
+      name: 'aboutTitle',
+      title: 'Título (Acerca del proyecto)',
+      description: 'Título editorial de la sección "Acerca del proyecto" (ej: "Un refugio diseñado para el bienestar y la conexión con la naturaleza"). Si se deja vacío, se usa el predeterminado.',
+      type: 'string',
+      group: ['about', 'info'],
+    }),
+    defineField({
+      name: 'aboutDescription',
+      title: 'Descripción (Acerca del proyecto)',
+      description: 'Texto descriptivo editorial completo que acompaña las estadísticas en la sección "Acerca del proyecto". Si se deja vacío, tomará la descripción general.',
+      type: 'text',
+      rows: 6,
+      group: ['about', 'info'],
     }),
 
     // ─── MEDIA ───────────────────────────────────────────────────────────────

@@ -5,6 +5,9 @@ export interface Project {
   region: 'baja-california-sur' | 'michoacan'
   tagline: string
   description: string
+  aboutLabel?: string
+  aboutTitle?: string
+  aboutDescription?: string
   image: string
   video: string
   heroVideo: string
@@ -130,6 +133,8 @@ export const projectsData: Project[] = [
     region: 'baja-california-sur',
     tagline: 'Ranch living regenerativo',
     description: 'Eco ranch living para quienes buscan conexión profunda con la tierra, amplitud y naturaleza. Un espacio donde el silencio y el paisaje son protagonistas.',
+    aboutTitle: 'Un refugio diseñado para el bienestar y la conexión con la naturaleza',
+    aboutDescription: 'Eco ranch living para disfrutar de una conexión profunda con la tierra, la naturaleza y el bienestar integral. Un espacio donde el silencio y el paisaje son protagonistas. Pensado en cuatro estilos de vida para crear armonía entre la arquitectura contemporánea y el entorno natural que lo rodea a unos pasos extraordinario Mar de Cortés.',
     image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2070&auto=format&fit=crop',
     video: 'https://videos.pexels.com/video-files/2169880/2169880-hd_1920_1080_30fps.mp4',
     heroVideo: 'https://videos.pexels.com/video-files/2169880/2169880-hd_1920_1080_30fps.mp4',

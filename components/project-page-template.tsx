@@ -102,6 +102,10 @@ function StatsSection({ project }: { project: Project }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
 
+  const aboutLabel = project.aboutLabel || "Acerca del proyecto"
+  const aboutTitle = project.aboutTitle || "Un refugio diseñado para el bienestar y la conexión con la naturaleza"
+  const aboutDescription = project.aboutDescription || project.description
+
   return (
     <section ref={ref} className="py-20 md:py-28 bg-warm-white">
       <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20">
@@ -112,12 +116,12 @@ function StatsSection({ project }: { project: Project }) {
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span className="text-xs tracking-luxury uppercase text-khaki mb-6 block">Acerca del proyecto</span>
+            <span className="text-xs tracking-luxury uppercase text-khaki mb-6 block">{aboutLabel}</span>
             <h2 className="font-serif text-3xl md:text-4xl text-gunmetal leading-[1.2] mb-6">
-              Un refugio diseñado para el bienestar y la conexión con la naturaleza
+              {aboutTitle}
             </h2>
-            <p className="text-rifle-green/70 text-base leading-relaxed font-light">
-              {project.description} Cada espacio ha sido cuidadosamente pensado para crear armonía entre la arquitectura contemporánea y el entorno natural que lo rodea.
+            <p className="text-rifle-green/70 text-base leading-relaxed font-light whitespace-pre-line">
+              {aboutDescription}
             </p>
           </motion.div>
 
