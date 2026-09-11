@@ -332,7 +332,7 @@ export function InteractiveProjects({ projects }: { projects?: any[] }) {
           className="flex flex-col md:flex-row md:items-end md:justify-between gap-6"
         >
           <div>
-            <span className="text-xs tracking-luxury uppercase text-khaki font-medium">Portfolio</span>
+            <span className="text-xs tracking-luxury uppercase text-khaki font-medium">Portafolio</span>
             <h2 className="mt-6 font-serif text-4xl md:text-5xl lg:text-6xl text-gunmetal leading-[1.2]">
               Nuestras comunidades
             </h2>

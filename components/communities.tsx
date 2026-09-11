@@ -59,7 +59,7 @@ export function Communities() {
           className="flex flex-col md:flex-row md:items-end md:justify-between mb-20"
         >
           <div>
-            <span className="text-xs tracking-luxury uppercase text-khaki">Portfolio</span>
+            <span className="text-xs tracking-luxury uppercase text-khaki">Portafolio</span>
             <h2 className="mt-6 font-serif text-4xl md:text-5xl lg:text-6xl text-gunmetal leading-[1.2]">
               Nuestras comunidades
             </h2>
