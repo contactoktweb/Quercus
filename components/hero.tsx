@@ -54,7 +54,7 @@ export function Hero({ data }: { data?: any }) {
             transition={{ duration: 1, delay: 1 }}
           />
 
-          <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl xl:text-8xl text-warm-white leading-[1.1] tracking-wide text-balance">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-warm-white leading-[1.15] tracking-wide text-balance">
             {title}
           </h1>
 
@@ -62,7 +62,7 @@ export function Hero({ data }: { data?: any }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-8 text-lg md:text-xl text-warm-white/80 max-w-2xl mx-auto leading-relaxed font-light"
+            className="mt-6 md:mt-8 text-base md:text-lg text-warm-white/80 max-w-2xl mx-auto leading-relaxed font-light"
           >
             {subtitle}
           </motion.p>
