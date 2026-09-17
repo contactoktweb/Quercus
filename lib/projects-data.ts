@@ -8,10 +8,11 @@ export interface Project {
   aboutLabel?: string
   aboutTitle?: string
   aboutDescription?: string
-  image: string
-  video: string
-  heroVideo: string
-  logo?: string
+  image: string | any
+  video?: string | any
+  heroVideo?: string | any
+  logo?: string | any
+  masterPlanImage?: string | any
   stats: {
     label: string
     value: string

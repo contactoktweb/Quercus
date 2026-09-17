@@ -8,7 +8,7 @@ import { Header } from '@/components/header'
 import { Footer } from '@/components/footer'
 import { InteractiveMasterPlan } from '@/components/interactive-master-plan'
 import { Investment } from '@/components/investment'
-import { MasonryGallery } from '@/components/masonry-gallery'
+import { Skiper54Gallery } from '@/components/skiper54-gallery'
 import { ContactForm } from '@/components/contact-form'
 import { Project } from '@/lib/projects-data'
 
@@ -235,7 +235,11 @@ export function ProjectPageTemplate({ project, sanityLots = [], config, projects
                 Descubre cada detalle
               </h2>
             </div>
-            <MasonryGallery images={project.gallery} />
+            <Skiper54Gallery 
+              images={project.gallery} 
+              projectName={project.name}
+              theme="light"
+            />
           </div>
         </section>
       )}
@@ -250,7 +254,11 @@ export function ProjectPageTemplate({ project, sanityLots = [], config, projects
                 Visión arquitectónica
               </h2>
             </div>
-            <MasonryGallery images={project.renders} theme="dark" />
+            <Skiper54Gallery 
+              images={project.renders} 
+              projectName={project.name}
+              theme="dark" 
+            />
           </div>
         </section>
       )}
