@@ -27,11 +27,21 @@ const defaultTestimonials = [
   },
 ]
 
+function cleanQuote(text?: string): string {
+  if (!text) return ''
+  return text
+    .trim()
+    .replace(/^["'“”«»„\s]+/, '')
+    .replace(/["'“”«»„\s]+$/, '')
+    .trim()
+}
+
 export function Testimonials({ data }: { data?: any }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: "-100px" })
   const [currentIndex, setCurrentIndex] = useState(0)
   const [direction, setDirection] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
 
   const testimonials = data?.testimonials?.length ? data.testimonials : defaultTestimonials
 
@@ -45,13 +55,14 @@ export function Testimonials({ data }: { data?: any }) {
     })
   }, [testimonials.length])
 
-  // Auto-advance
+  // Auto-advance with hover pause
   useEffect(() => {
+    if (isPaused) return
     const timer = setInterval(() => {
       paginate(1)
     }, 7000)
     return () => clearInterval(timer)
-  }, [paginate])
+  }, [paginate, isPaused])
 
   const variants = {
     enter: (direction: number) => ({
@@ -93,16 +104,18 @@ export function Testimonials({ data }: { data?: any }) {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="relative"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
         >
           {/* Quote Icon */}
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-khaki/20">
+          <div className="absolute -top-8 left-1/2 -translate-x-1/2 text-khaki/20 pointer-events-none select-none" aria-hidden="true">
             <svg className="w-20 h-20 md:w-28 md:h-28" fill="currentColor" viewBox="0 0 24 24">
               <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
             </svg>
           </div>
 
           {/* Carousel Container */}
-          <div className="relative min-h-[300px] md:min-h-[280px] overflow-hidden">
+          <div className="relative min-h-[340px] md:min-h-[290px] overflow-hidden flex items-center justify-center">
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={currentIndex}
@@ -111,15 +124,26 @@ export function Testimonials({ data }: { data?: any }) {
                 initial="enter"
                 animate="center"
                 exit="exit"
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.2}
+                onDragEnd={(_, { offset, velocity }) => {
+                  const swipe = offset.x
+                  if (swipe < -40 || velocity.x < -300) {
+                    paginate(1)
+                  } else if (swipe > 40 || velocity.x > 300) {
+                    paginate(-1)
+                  }
+                }}
                 transition={{ 
                   duration: 0.6, 
                   ease: [0.22, 1, 0.36, 1] 
                 }}
-                className="absolute inset-0 flex flex-col items-center justify-center text-center px-4"
+                className="w-full flex flex-col items-center justify-center text-center px-4 py-4 cursor-grab active:cursor-grabbing touch-pan-y select-none"
               >
                 {/* Quote */}
                 <blockquote className="font-serif text-2xl md:text-3xl lg:text-4xl text-gunmetal leading-[1.4] max-w-4xl text-balance">
-                  &ldquo;{testimonials[currentIndex].quote}&rdquo;
+                  &ldquo;{cleanQuote(testimonials[currentIndex].quote)}&rdquo;
                 </blockquote>
 
                 {/* Attribution */}
@@ -209,7 +233,7 @@ export function Testimonials({ data }: { data?: any }) {
 
               {/* Quote */}
               <p className="text-gunmetal text-base leading-relaxed mb-8">
-                &ldquo;{testimonial.quote}&rdquo;
+                &ldquo;{cleanQuote(testimonial.quote)}&rdquo;
               </p>
 
               {/* Attribution */}

@@ -139,6 +139,7 @@ export const HISTORIA_PAGE_QUERY = `*[_type == "historiaPage"][0]{
   sustainabilityTitle,
   sustainabilityText,
   sustainabilityImage{ asset->{url}, alt },
+  sustainabilityStats[]{ value, label },
   finalCtaTitle,
   finalCtaSubtitle,
   finalCtaButtonText,

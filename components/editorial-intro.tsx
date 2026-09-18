@@ -134,12 +134,24 @@ export function EditorialIntro({ data }: { data?: any }) {
         initial={{ opacity: 0, y: 30 }}
         animate={isSectionInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 1, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-        className="mt-32 max-w-[1400px] mx-auto pt-16 border-t border-silver-sand/30 grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12"
+        className={`mt-32 max-w-[1400px] mx-auto pt-16 border-t border-silver-sand/30 ${
+          stats.length === 1
+            ? 'flex justify-center items-center text-center'
+            : stats.length === 2
+            ? 'flex flex-wrap justify-center items-center gap-12 md:gap-24 text-center'
+            : stats.length === 3
+            ? 'flex flex-wrap justify-center items-center gap-8 md:gap-16 text-center'
+            : 'grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12'
+        }`}
       >
         {stats.map((stat: any) => (
-          <div key={stat.label} className="text-center">
-            <div className="font-serif text-4xl md:text-5xl text-gunmetal">{stat.number}</div>
-            <div className="mt-2 text-xs tracking-luxury uppercase text-rifle-green/60">{stat.label}</div>
+          <div key={stat.label} className="text-center max-w-sm px-4">
+            <div className="font-serif text-4xl md:text-5xl lg:text-6xl text-gunmetal tracking-tight">
+              {stat.number?.trim()}
+            </div>
+            <div className="mt-3 text-xs md:text-sm tracking-luxury uppercase text-rifle-green/70 leading-relaxed max-w-[280px] mx-auto">
+              {stat.label}
+            </div>
           </div>
         ))}
       </motion.div>

@@ -35,7 +35,7 @@ export default async function Home() {
       <Testimonials data={homeData} />
 
       <ContactForm data={homeData} config={configData} />
-      <Footer config={configData} />
+      <Footer config={configData} projects={projectsData} />
     </main>
   )
 }

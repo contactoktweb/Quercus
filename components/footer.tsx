@@ -22,12 +22,19 @@ const defaultFooterLinks = {
   ]
 }
 
-export function Footer({ config }: { config?: any }) {
+export function Footer({ config, projects }: { config?: any, projects?: any[] }) {
   const footerDescription = config?.footerDescription || 'Creando comunidades regenerativas en Baja California Sur.'
   const logoUrl = optimizeSanityUrl(config?.logo) || '/logos/Recurso 9 (1).png'
   const socialLinks = config?.socialLinks?.length > 0 
     ? config.socialLinks.map((link: any) => ({ name: link.platform, href: link.url }))
     : defaultFooterLinks.social
+
+  const comunidadesLinks = projects && projects.length > 0
+    ? projects.map((project: any) => ({
+        name: project.name,
+        href: `/proyectos/${project.slug}`,
+      }))
+    : defaultFooterLinks.comunidades
 
   return (
     <footer className="bg-gunmetal py-20 md:py-32">
@@ -51,7 +58,7 @@ export function Footer({ config }: { config?: any }) {
           <div>
             <h3 className="text-xs tracking-luxury uppercase text-khaki mb-6">Comunidades</h3>
             <ul className="space-y-3">
-              {defaultFooterLinks.comunidades.map((link) => (
+              {comunidadesLinks.map((link: any) => (
                 <li key={link.name}>
                   <Link 
                     href={link.href}

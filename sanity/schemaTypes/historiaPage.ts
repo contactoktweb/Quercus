@@ -171,6 +171,28 @@ export const historiaPage = defineType({
         defineField({ name: 'alt', title: 'Alt', type: 'string' }),
       ],
     }),
+    defineField({
+      name: 'sustainabilityStats',
+      title: 'Estadísticas del Legado (+20 Años, etc.)',
+      description: 'Cifras y etiquetas de la sección Nuestro Legado (ej: 20+ Años, 10 Comunidades, 2 Estados)',
+      type: 'array',
+      group: 'sustainability',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            defineField({ name: 'value', title: 'Cifra / Valor', type: 'string', description: 'ej: "20+", "10", "2"' }),
+            defineField({ name: 'label', title: 'Etiqueta', type: 'string', description: 'ej: "Años", "Comunidades", "Estados"' }),
+          ],
+          preview: {
+            select: { title: 'value', subtitle: 'label' },
+            prepare({ title, subtitle }) {
+              return { title: `${title || ''} ${subtitle || ''}` }
+            },
+          },
+        },
+      ],
+    }),
 
     // ─── FINAL CTA ───────────────────────────────────────────────────────────
     defineField({

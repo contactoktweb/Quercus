@@ -122,7 +122,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </div>
       </article>
 
-      <Footer config={config} />
+      <Footer config={config} projects={projects} />
     </main>
   )
 }

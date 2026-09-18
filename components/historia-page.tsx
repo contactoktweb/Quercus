@@ -133,7 +133,21 @@ function TimelineSection({ data }: { data?: any }) {
               >
                 {/* Content */}
                 <div className={`md:w-1/2 ${index % 2 === 0 ? 'md:text-right md:pr-12' : 'md:text-left md:pl-12'}`}>
-                  <div className="bg-soft-black/30 p-6 md:p-8 border border-silver-sand/10 hover:border-khaki/30 transition-colors duration-500">
+                  <div className="bg-soft-black/30 p-6 md:p-8 border border-silver-sand/10 hover:border-khaki/30 transition-colors duration-500 overflow-hidden group">
+                    {(() => {
+                      const imageUrl = typeof item.image === 'string' ? item.image : item.image?.asset?.url
+                      if (!imageUrl) return null
+                      return (
+                        <div className="relative aspect-[16/10] w-full overflow-hidden mb-6 border border-silver-sand/10 bg-soft-black/50">
+                          <img
+                            src={optimizeSanityUrl(imageUrl, { width: 800, quality: 85 })}
+                            alt={item.image?.alt || item.title || `Hito ${item.year}`}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                        </div>
+                      )
+                    })()}
                     <span className="text-khaki text-3xl md:text-4xl font-serif">{item.year}</span>
                     <h3 className="font-serif text-xl text-warm-white mt-3 mb-2">{item.title}</h3>
                     <p className="text-silver-sand/60 text-sm font-light leading-relaxed">{item.description}</p>
@@ -163,6 +177,13 @@ function LegacySection({ data }: { data?: any }) {
   const label = data?.sustainabilityLabel || 'Nuestro legado'
   const title = data?.sustainabilityTitle || 'Un legado en evolución'
   const text = data?.sustainabilityText || 'Cada comunidad representa una forma distinta de entender el territorio: desde el bosque y la montaña hasta el desierto, la playa y el Mar de Cortés. Nuestra historia es un testimonio de respeto por la naturaleza y compromiso con el bienestar humano.'
+
+  const defaultLegacyStats = [
+    { value: '20+', label: 'Años' },
+    { value: '10', label: 'Comunidades' },
+    { value: '2', label: 'Estados' },
+  ]
+  const stats = data?.sustainabilityStats?.length > 0 ? data.sustainabilityStats : defaultLegacyStats
 
   return (
     <section ref={ref} className="py-24 md:py-32 bg-warm-white">
@@ -194,19 +215,13 @@ function LegacySection({ data }: { data?: any }) {
             <p className="text-rifle-green/70 text-base leading-relaxed font-light mb-8">
               {text}
             </p>
-            <div className="flex flex-wrap gap-6 text-center">
-              <div>
-                <span className="block font-serif text-3xl text-gunmetal">20+</span>
-                <span className="text-xs tracking-luxury uppercase text-rifle-green/50">Años</span>
-              </div>
-              <div>
-                <span className="block font-serif text-3xl text-gunmetal">10</span>
-                <span className="text-xs tracking-luxury uppercase text-rifle-green/50">Comunidades</span>
-              </div>
-              <div>
-                <span className="block font-serif text-3xl text-gunmetal">2</span>
-                <span className="text-xs tracking-luxury uppercase text-rifle-green/50">Estados</span>
-              </div>
+            <div className="flex flex-wrap gap-8 text-center">
+              {stats.map((stat: any, i: number) => (
+                <div key={i}>
+                  <span className="block font-serif text-3xl md:text-4xl text-gunmetal">{stat.value}</span>
+                  <span className="text-xs tracking-luxury uppercase text-rifle-green/60 mt-1 block">{stat.label}</span>
+                </div>
+              ))}
             </div>
           </motion.div>
         </div>
@@ -274,7 +289,7 @@ export function HistoriaPage({ data, config, projects }: { data?: any, config?: 
       <TimelineSection data={data} />
       <LegacySection data={data} />
       <FinalCTASection data={data} />
-      <Footer config={config} />
+      <Footer config={config} projects={projects} />
     </main>
   )
 }

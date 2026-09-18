@@ -81,7 +81,7 @@ export default async function SostenibilidadPage() {
         )}
       </section>
 
-      <Footer config={config} />
+      <Footer config={config} projects={projects} />
     </main>
   )
 }

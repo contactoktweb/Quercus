@@ -266,7 +266,7 @@ export function ProjectPageTemplate({ project, sanityLots = [], config, projects
       {/* Contact Form Section */}
       <ContactForm />
 
-      <Footer config={config} />
+      <Footer config={config} projects={projects} />
     </main>
   )
 }
